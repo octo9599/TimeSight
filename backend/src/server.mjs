@@ -5,14 +5,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-
+//initialize app
 const app = express();
-
-
 app.use(cors());
 app.use(express.json());
 
 
+//connect to the database
 const pool = mariadb.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
@@ -21,6 +20,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5,
 });
 
+//function for executing sql cleanly and safely.
 async function runQuery(query, params = []) {
   let conn;
   try {
@@ -35,11 +35,14 @@ async function runQuery(query, params = []) {
   }
 }
 
+
+//GETs (Reading Data/SELECT Statements)
+
 app.get("/", (req, res) => {
   res.json({ message: "API is running!" });
 });
 
-// Example GET (read data)
+//Get tasks, either per group or per group and date.
 app.get("/termin", async (req, res) => {
   try {
     const {group_id, datum} = req.query;
@@ -61,6 +64,7 @@ app.get("/termin", async (req, res) => {
   }
 });
 
+//Get a group, either through group_id or per invite_code
 app.get("/gruppe", async (req, res) => {
     try {
         const {group_id, invite_code} = req.query;
@@ -82,6 +86,23 @@ app.get("/gruppe", async (req, res) => {
     }
 });
 
+//Get a user through user_id
+app.get("/user", async (req, res) => {
+    try {
+        const {user_id} = req.params;
+        let sql = "SELECT * FROM User WHERE pk_user_id = ?";
+        const params = [user_id];
+        if(!user_id) {
+          return res.status(400).json({ error: "user_id is required for viewing a user"});
+        }
+        const rows = await runQuery(sql, params);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch users"})
+    }
+});
+
+//Get all users of a group and their group-rights through a group_id
 app.get("/gruppe/:group_id/user", async (req, res) => {
     try {
         const {group_id} = req.params;
@@ -97,7 +118,7 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
     }
 });
 
-// Example POST (create data)
+//Create a new Task
 app.post("/termin", async (req, res) => {
   const { bezeichnung, beschreibung, datum } = req.body;
 
@@ -119,7 +140,7 @@ app.post("/termin", async (req, res) => {
 
 
 
-
+//On which port the backend runs.
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API running at http://localhost:${PORT}`);
