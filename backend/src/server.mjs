@@ -42,12 +42,32 @@ app.get("/", (req, res) => {
 // Example GET (read data)
 app.get("/termin", async (req, res) => {
   try {
-    const rows = await runQuery("SELECT * FROM Termin");
+    const {fk_group_id, datum} = req.query;
+    if(!fk_group_id) {
+        return res.status(400).json({ error: "Group_id is required for viewing Termin"});
+    }
+    let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
+    const params = [fk_group_id];
+    if(datum) {
+        sql += " AND datum = ?";
+        params.push(datum);
+    } else {
+        sql += " ORDER BY datum, bezeichnung"
+    }
+    const rows = await runQuery(sql, params);
     res.json(rows);
   } catch {
     res.status(500).json({ error: "Failed to fetch termine" });
   }
 });
+
+app.get("/gruppe", async (req, res) => {
+    try {
+        const {group_id, invite_code} = req.query;
+    } catch {
+        res.status(500).json({error: "Failed to fetch gruppen"})
+    }
+})
 
 // Example POST (create data)
 app.post("/termin", async (req, res) => {
@@ -69,8 +89,7 @@ app.post("/termin", async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get("/health", (req, res) => res.send("OK"));
+
 
 
 const PORT = process.env.PORT || 3000;
