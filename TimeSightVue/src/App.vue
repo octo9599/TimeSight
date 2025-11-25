@@ -1,11 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import SideBar from "@/components/SideBar.vue";
+import TopBar from "@/components/TopBar.vue";
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <TopBar/>
+  <SideBar/>
 </template>
 
-<style scoped></style>
+<style>
+// make font available globally
+@font-face {
+  font-family: JockeyOne;
+  src: url('@/assets/fonts/JockeyOne-Regular.ttf');
+}
+
+</style>
