@@ -20,7 +20,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5,
 });
 
-//function for executing sql cleanly and safely.
+//function for executing sql statements cleanly and safely.
 async function runQuery(query, params = []) {
   let conn;
   try {
@@ -36,6 +36,7 @@ async function runQuery(query, params = []) {
 }
 
 
+
 //GETs (Reading Data/SELECT Statements)
 
 app.get("/", (req, res) => {
@@ -45,12 +46,16 @@ app.get("/", (req, res) => {
 //Get tasks, either per group or per group and date.
 app.get("/termin", async (req, res) => {
   try {
-    const {group_id, datum} = req.query;
+    const {group_id, datum, ist_erledigt} = req.query;
     if(!group_id) {
         return res.status(400).json({ error: "group_id is required for viewing tasks"});
     }
-    let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
+    let sql = "SELECT * FROM Termin WHERE fk_group_id = ? AND ist_erledigt = false";
     const params = [group_id];
+    if(ist_erledigt) {
+      sql += " AND ist_erledigt = ?";
+      params.push(ist_erledigt);
+    }
     if(datum) {
         sql += " AND datum = ?";
         params.push(datum);
@@ -118,6 +123,10 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
     }
 });
 
+
+
+//POSTs (create new Data/INSERTs)
+
 //Create a new Task
 app.post("/termin", async (req, res) => {
   const { bezeichnung, beschreibung, datum } = req.body;
@@ -140,7 +149,7 @@ app.post("/termin", async (req, res) => {
 
 
 
-//On which port the backend runs.
+//Define on which port the backend runs.
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API running at http://localhost:${PORT}`);
