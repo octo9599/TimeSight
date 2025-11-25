@@ -43,25 +43,32 @@ app.get("/", (req, res) => {
   res.json({ message: "API is running!" });
 });
 
-//Get tasks, either per group or per group and date.
+//Get tasks, either per group or per group and date. Lists completed tasks if 'ist_erledigt=1' is in query, otherwise only lists uncompleted tasks.
+//Only lists uncompleted past due exams if 'is_past_due=1* is in query.
 app.get("/termin", async (req, res) => {
   try {
-    const {group_id, datum, ist_erledigt} = req.query;
+    const {group_id, datum, is_past_due, ist_erledigt} = req.query;
     if(!group_id) {
         return res.status(400).json({ error: "group_id is required for viewing tasks"});
     }
-    let sql = "SELECT * FROM Termin WHERE fk_group_id = ? AND ist_erledigt = false";
+    let sql = "SELECT *, CURDATE() FROM Termin WHERE fk_group_id = ?";
     const params = [group_id];
-    if(ist_erledigt) {
-      sql += " AND ist_erledigt = ?";
-      params.push(ist_erledigt);
+
+    if(is_past_due == 1) {
+      sql += " AND ist_erledigt = false AND datum < CURDATE()";
+    } else if(ist_erledigt == 1) {
+      sql += " AND ist_erledigt = true"; 
+    } else {
+      sql += " AND datum >= CURDATE() AND ist_erledigt = false";
     }
+
     if(datum) {
         sql += " AND datum = ?";
         params.push(datum);
     } else {
         sql += " ORDER BY datum, bezeichnung"
     }
+
     const rows = await runQuery(sql, params);
     res.json(rows);
   } catch {
