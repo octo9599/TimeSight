@@ -42,12 +42,12 @@ app.get("/", (req, res) => {
 // Example GET (read data)
 app.get("/termin", async (req, res) => {
   try {
-    const {fk_group_id, datum} = req.query;
-    if(!fk_group_id) {
-        return res.status(400).json({ error: "Group_id is required for viewing Termin"});
+    const {group_id, datum} = req.query;
+    if(!group_id) {
+        return res.status(400).json({ error: "group_id is required for viewing Termin"});
     }
     let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
-    const params = [fk_group_id];
+    const params = [group_id];
     if(datum) {
         sql += " AND datum = ?";
         params.push(datum);
@@ -64,10 +64,23 @@ app.get("/termin", async (req, res) => {
 app.get("/gruppe", async (req, res) => {
     try {
         const {group_id, invite_code} = req.query;
+        let sql = "SELECT * FROM Gruppe";
+        const params = [];
+        if(group_id) {
+          sql += " WHERE pk_group_id = ?";
+          params.push(group_id);
+        } else if (invite_code) {
+          sql += " WHERE invite_code = ?";
+          params.push(invite_code);
+        } else {
+          return res.status(400).json({ error: "group_id or invite_code is required for viewing gruppe"});
+        }
+        const rows = await runQuery(sql, params);
+        res.json(rows);
     } catch {
-        res.status(500).json({error: "Failed to fetch gruppen"})
+        res.status(500).json({error: "Failed to fetch gruppe"})
     }
-})
+});
 
 // Example POST (create data)
 app.post("/termin", async (req, res) => {
