@@ -44,7 +44,7 @@ app.get("/termin", async (req, res) => {
   try {
     const {group_id, datum} = req.query;
     if(!group_id) {
-        return res.status(400).json({ error: "group_id is required for viewing Termin"});
+        return res.status(400).json({ error: "group_id is required for viewing tasks"});
     }
     let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
     const params = [group_id];
@@ -57,7 +57,7 @@ app.get("/termin", async (req, res) => {
     const rows = await runQuery(sql, params);
     res.json(rows);
   } catch {
-    res.status(500).json({ error: "Failed to fetch termine" });
+    res.status(500).json({ error: "Failed to fetch tasks" });
   }
 });
 
@@ -73,12 +73,27 @@ app.get("/gruppe", async (req, res) => {
           sql += " WHERE invite_code = ?";
           params.push(invite_code);
         } else {
-          return res.status(400).json({ error: "group_id or invite_code is required for viewing gruppe"});
+          return res.status(400).json({ error: "group_id or invite_code is required for viewing groups"});
         }
         const rows = await runQuery(sql, params);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch gruppe"})
+    }
+});
+
+app.get("/gruppe/:group_id/user", async (req, res) => {
+    try {
+        const {group_id} = req.params;
+        let sql = "SELECT u.*, gu.ist_admin, gu.kann_bearbeiten, gu.kann_loeschen FROM User u INNER JOIN Gruppe_User gu ON pk_user_id = gu.fk_user_id WHERE gu.fk_group_id = ?";
+        const params = [group_id];
+        if(!group_id) {
+          return res.status(400).json({ error: "group_id is required for viewing users in a group"});
+        }
+        const rows = await runQuery(sql, params);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch users"})
     }
 });
 
