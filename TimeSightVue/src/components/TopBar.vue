@@ -5,8 +5,10 @@
 <template>
   <div id="topbar-container">
     <!-- actual app icon will go here once available-->
-    <img class="icons" id="eye-icon" src="../assets/images/TEMPORARY-Logo-Icon.png" alt="TimeSight Logo">
-    <h1>TimeSight</h1>
+    <a href="/">
+      <img class="icons" id="eye-icon" src="../assets/images/TEMPORARY-Logo-Icon.png" alt="TimeSight Logo">
+    </a>
+    <h1><span class="highlighted">T</span>ime<span class="highlighted">S</span>ight</h1> <!-- janky but working way to make T and S colored differently -->
     <!-- actual account icon will go here once available-->
     <img class="icons" id="acc-icon" src="../assets/images/TEMPORARY-Account-Icon.png" alt="Account Menu">
   </div>
@@ -14,9 +16,15 @@
 
 <style scoped>
 h1 {
-  font-family: JockeyOne, sans-serif;
-  color: #DBF1FF;
+  font-family: JockeyOne, serif;
+  color: var(--text-dark);
   font-size: 94px;
+  letter-spacing: 3px;
+  margin: 0 40px;
+}
+
+span.highlighted {
+  color: var(--accent-dark);
 }
 
 #topbar-container {
@@ -30,6 +38,6 @@ h1 {
 img.icons {
   width: max-content;
   height: max-content;
-  margin: 0 10px;
+  margin: 0 15px;
 }
 </style>

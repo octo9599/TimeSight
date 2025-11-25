@@ -8,11 +8,10 @@ import TopBar from "@/components/TopBar.vue";
   <SideBar/>
 </template>
 
-<style>
-// make font available globally
+<style scoped>
+/* make font available globally */
 @font-face {
   font-family: JockeyOne;
   src: url('@/assets/fonts/JockeyOne-Regular.ttf');
 }
-
 </style>
