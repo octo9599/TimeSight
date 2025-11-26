@@ -188,7 +188,7 @@ app.post("/termin", async (req, res) => {
       [bezeichnung, beschreibung, datum, group_id, user_id]
     );
 
-    res.status(201).json({ id: result.insertId, beschreibung: beschreibung, bezeichnung: bezeichnung, datum: datum, fk_group_id: group_id, fk_ersteller_id: user_id });
+    res.status(201).json({ id: Number(result.insertId), beschreibung: beschreibung, bezeichnung: bezeichnung, datum: datum, fk_group_id: group_id, fk_ersteller_id: user_id });
   } catch {
     res.status(500).json({ error: "Failed to create task" });
   }
@@ -209,7 +209,7 @@ app.post("/gruppe", async (req, res) => {
       [gruppenname, invite_code]
     );
 
-    res.status(201).json({ id: result.insertId, gruppenname: gruppenname, invite_code: invite_code });
+    res.status(201).json({ id: Number(result.insertId), gruppenname: gruppenname, invite_code: invite_code });
   } catch {
     res.status(500).json({ error: "Failed to create group" });
   }
@@ -225,7 +225,6 @@ app.post("/gruppe_user", async (req, res) => {
   if(markierungsfarbe) {
     params.push(markierungsfarbe);
   } else {
-    console.log(markierungsfarbe);
     params.push(null);
   }
   params.push(ist_admin, kann_bearbeiten, kann_loeschen, group_id, user_id);
@@ -237,7 +236,7 @@ app.post("/gruppe_user", async (req, res) => {
       params
     );
 
-    res.status(201).json({ id: result.insertId, markierungsfarbe: markierungsfarbe, ist_admin: ist_admin, kann_bearbeiten: kann_bearbeiten, kann_loeschen: kann_loeschen, group_id: group_id, user_id: user_id });
+    res.status(201).json({ id: Number(result.insertId), markierungsfarbe: markierungsfarbe, ist_admin: ist_admin, kann_bearbeiten: kann_bearbeiten, kann_loeschen: kann_loeschen, group_id: group_id, user_id: user_id });
   } catch {
     res.status(500).json({ error: "Failed to insert user into group" });
   }
