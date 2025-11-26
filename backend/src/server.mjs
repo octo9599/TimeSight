@@ -325,8 +325,33 @@ app.post("/beitritt_anfrage", async (req, res) => {
 
 //DELETEs (remove Data)
 
+//Delete a User
+app.delete("/user/:user_id", async (req, res) => {
+  const { user_id } = req.params;
 
+  try {
+    if(!user_id) {
+      return res.status(400).json({ error: "user_id is required to delete a user" });
+    }
 
+    await runQuery("DELETE FROM Gruppe_User WHERE fk_user_id = ?", [user_id]);
+    await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_user_id = ?", [user_id]);
+
+    const result = await runQuery(
+      "DELETE FROM User WHERE pk_user_id = ?",
+      [user_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
 
 
 
