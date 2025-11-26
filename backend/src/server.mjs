@@ -183,17 +183,37 @@ app.post("/termin", async (req, res) => {
 
   try {
     const result = await runQuery(
-      //(pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
+      //Termin (pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
       "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
       [bezeichnung, beschreibung, datum, group_id, user_id]
     );
 
-    res.status(201).json({ id: result.insertId, beschreibung, bezeichnung, datum, group_id, user_id });
+    res.status(201).json({ id: result.insertId, beschreibung: beschreibung, bezeichnung: bezeichnung, datum: datum, fk_group_id: group_id, fk_ersteller_id: user_id });
   } catch {
     res.status(500).json({ error: "Failed to create Termin" });
   }
 });
 
+//Create a new Group
+app.post("/gruppe", async (req, res) => {
+  const { gruppenname, invite_code } = req.body;
+
+  if (!gruppenname || !invite_code) {
+    return res.status(400).json({ error: "gruppenname and invite_code are required to create a group." });
+  }
+
+  try {
+    const result = await runQuery(
+      //Gruppe (pk_group_id, gruppenname, invite_code)
+      "INSERT INTO Gruppe VALUES (null, ?, ?)",
+      [gruppenname, invite_code]
+    );
+
+    res.status(201).json({ id: result.insertId, gruppenname: gruppenname, invite_code: invite_code });
+  } catch {
+    res.status(500).json({ error: "Failed to create Termin" });
+  }
+});
 
 //Define on which port the backend runs.
 const PORT = process.env.PORT || 3000;
