@@ -39,6 +39,7 @@ async function runQuery(query, params = []) {
 
 //GETs (Reading Data/SELECT Statements)
 
+//Test Get to make sure API is running in the first place.
 app.get("/", (req, res) => {
   res.json({ message: "API is running!" });
 });
@@ -90,6 +91,25 @@ app.get("/gruppe", async (req, res) => {
           params.push(invite_code);
         } else {
           return res.status(400).json({ error: "group_id or invite_code is required for viewing groups"});
+        }
+        const rows = await runQuery(sql, params);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch gruppe"})
+    }
+});
+
+//get all groups of a user
+app.get("/user/:user_id/gruppe", async (req, res) => {
+    try {
+        const {user_id} = req.params;
+        let sql = "SELECT g.* FROM Gruppe g INNER JOIN Gruppe_User gu ON pk_group_id = gu.fk_group_id";
+        const params = [];
+        if(user_id) {
+          sql += " WHERE gu.fk_user_id = ?";
+          params.push(user_id);
+        } else {
+          return res.status(400).json({ error: "user_id is required for viewing groups of a user"});
         }
         const rows = await runQuery(sql, params);
         res.json(rows);
