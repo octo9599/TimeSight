@@ -407,6 +407,31 @@ app.delete("/gruppe_user", async (req, res) => {
   }
 });
 
+//Delete a task
+app.delete("/termin/:termin_id", async (req, res) => {
+  const { termin_id } = req.params;
+
+  try {
+    if(!termin_id) {
+      return res.status(400).json({ error: "termin_id is required to delete a task" });
+    }
+
+    const result = await runQuery(
+      "DELETE FROM Termin WHERE pk_termin_id = ?",
+      [termin_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete task" });
+  }
+});
+
 
 
 //Define on which port the backend runs.
