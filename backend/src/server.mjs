@@ -175,24 +175,24 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
 
 //Create a new Task
 app.post("/termin", async (req, res) => {
-  const { bezeichnung, beschreibung, datum } = req.body;
+  const { bezeichnung, beschreibung, datum, group_id, user_id } = req.body;
 
-  if (!bezeichnung || !beschreibung, datum) {
-    return res.status(400).json({ error: "bezeichnung, beschreibung, datum are required" });
+  if (!bezeichnung || !beschreibung || !datum || !group_id || !user_id) {
+    return res.status(400).json({ error: "bezeichnung, beschreibung, datum, group_id and user_id are required to create a task." });
   }
 
   try {
     const result = await runQuery(
-      "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, 0, 0)",
-      [bezeichnung, beschreibung, datum]
+      //(pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
+      "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
+      [bezeichnung, beschreibung, datum, group_id, user_id]
     );
 
-    res.status(201).json({ id: result.insertId, beschreibung, bezeichnung, datum });
+    res.status(201).json({ id: result.insertId, beschreibung, bezeichnung, datum, group_id, user_id });
   } catch {
     res.status(500).json({ error: "Failed to create Termin" });
   }
 });
-
 
 
 //Define on which port the backend runs.
