@@ -51,9 +51,7 @@ app.get("/termin", async (req, res) => {
     if(!termin_id) {
         return res.status(400).json({ error: "termin_id is required for viewing a task"});
     }
-    let sql = "SELECT * FROM Termin WHERE pk_termin_id = ?";
-    const params = [termin_id];
-    const rows = await runQuery(sql, params);
+    const rows = await runQuery("SELECT * FROM Termin WHERE pk_termin_id = ?", [termin_id]);
     res.json(rows);
   } catch {
     res.status(500).json({ error: "Failed to fetch tasks" });
@@ -122,15 +120,10 @@ app.get("/gruppe", async (req, res) => {
 app.get("/user/:user_id/gruppe", async (req, res) => {
     try {
         const {user_id} = req.params;
-        let sql = "SELECT g.* FROM Gruppe g INNER JOIN Gruppe_User gu ON pk_group_id = gu.fk_group_id";
-        const params = [];
-        if(user_id) {
-          sql += " WHERE gu.fk_user_id = ?";
-          params.push(user_id);
-        } else {
+        if(!user_id) {
           return res.status(400).json({ error: "user_id is required for viewing groups of a user"});
         }
-        const rows = await runQuery(sql, params);
+        const rows = await runQuery("SELECT g.* FROM Gruppe g INNER JOIN Gruppe_User gu ON pk_group_id = gu.fk_group_id WHERE gu.fk_user_id = ?", [user_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch gruppe"})
@@ -141,12 +134,24 @@ app.get("/user/:user_id/gruppe", async (req, res) => {
 app.get("/user", async (req, res) => {
     try {
         const {user_id} = req.params;
-        let sql = "SELECT * FROM User WHERE pk_user_id = ?";
-        const params = [user_id];
         if(!user_id) {
           return res.status(400).json({ error: "user_id is required for viewing a user"});
         }
-        const rows = await runQuery(sql, params);
+        const rows = await runQuery("SELECT * FROM User WHERE pk_user_id = ?", [user_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch users"})
+    }
+});
+
+//Get the group-rights of a user through a user_id and a group_id
+app.get("/gruppe_user", async (req, res) => {
+    try {
+        const {user_id, group_id} = req.query;
+        if(!user_id || !group_id) {
+          return res.status(400).json({ error: "user_id and group_id is required for viewing a user's group-rights"});
+        }
+        const rows = await runQuery("SELECT * FROM Gruppe_User WHERE fk_group_id = ? AND fk_user_id = ?", [group_id, user_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch users"})
@@ -230,7 +235,7 @@ app.post("/user", async (req, res) => {
       [username, email, passwort]
     );
 
-    res.status(201).json({ id: Number(result.insertId), username: username, email: email: passwort: passwort });
+    res.status(201).json({ id: Number(result.insertId), username: username, email: email, passwort: passwort });
   } catch {
     res.status(500).json({ error: "Failed to create user" });
   }
