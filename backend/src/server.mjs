@@ -45,7 +45,7 @@ app.get("/", (req, res) => {
 });
 
 //Get a task through an id
-app.get("/termin", async (req, res) => {
+app.get("/termin/:termin_id", async (req, res) => {
   try {
     const {termin_id} = req.params;
     if(!termin_id) {
@@ -93,23 +93,28 @@ app.get("/group/:group_id/termin", async (req, res) => {
   }
 });
 
-//Get a group, either through group_id or per invite_code
+//Get a group through a group_id
+app.get("/gruppe/:group_id", async (req, res) => {
+    try {
+        const {group_id} = req.params;
+        if(!group_id) {
+          return res.status(400).json({ error: "group_id is required for viewing a group"});
+        }
+        const rows = await runQuery("SELECT * FROM Gruppe WHERE pk_group_id = ?", [group_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch gruppe"})
+    }
+});
+
+//Get a group through an invite_code
 app.get("/gruppe", async (req, res) => {
     try {
         const {invite_code} = req.query;
-        const {group_id} = req.params;
-        let sql = "SELECT * FROM Gruppe";
-        const params = [];
-        if(group_id) {
-          sql += " WHERE pk_group_id = ?";
-          params.push(group_id);
-        } else if (invite_code) {
-          sql += " WHERE invite_code = ?";
-          params.push(invite_code);
-        } else {
-          return res.status(400).json({ error: "group_id or invite_code is required for viewing groups"});
+        if(!invite_code) {
+          return res.status(400).json({ error: "invite_code is required for viewing a group"});
         }
-        const rows = await runQuery(sql, params);
+        const rows = await runQuery("SELECT * FROM Gruppe WHERE invite_code = ?", [invite_code]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch gruppe"})
@@ -131,7 +136,7 @@ app.get("/user/:user_id/gruppe", async (req, res) => {
 });
 
 //Get a user through user_id
-app.get("/user", async (req, res) => {
+app.get("/user/:user_id", async (req, res) => {
     try {
         const {user_id} = req.params;
         if(!user_id) {
@@ -149,7 +154,7 @@ app.get("/gruppe_user", async (req, res) => {
     try {
         const {user_id, group_id} = req.query;
         if(!user_id || !group_id) {
-          return res.status(400).json({ error: "user_id and group_id is required for viewing a user's group-rights"});
+          return res.status(400).json({ error: "user_id and group_id are required for viewing a user's group-rights"});
         }
         const rows = await runQuery("SELECT * FROM Gruppe_User WHERE fk_group_id = ? AND fk_user_id = ?", [group_id, user_id]);
         res.json(rows);
@@ -163,11 +168,10 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
     try {
         const {group_id} = req.params;
         let sql = "SELECT u.*, gu.ist_admin, gu.kann_bearbeiten, gu.kann_loeschen FROM User u INNER JOIN Gruppe_User gu ON pk_user_id = gu.fk_user_id WHERE gu.fk_group_id = ?";
-        const params = [group_id];
         if(!group_id) {
           return res.status(400).json({ error: "group_id is required for viewing users in a group"});
         }
-        const rows = await runQuery(sql, params);
+        const rows = await runQuery(sql, [group_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch users"})
@@ -175,7 +179,7 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
 });
 
 //get a specific invite_request through an anfrage_id
-app.get("/beitritt_anfrage", async (req, res) => {
+app.get("/beitritt_anfrage/:anfrage_id", async (req, res) => {
     try {
         const {anfrage_id} = req.params;
         if(!anfrage_id) {
@@ -316,6 +320,13 @@ app.post("/beitritt_anfrage", async (req, res) => {
     res.status(500).json({ error: "Failed to create invite-request" });
   }
 });
+
+
+
+//DELETEs (remove Data)
+
+
+
 
 
 
