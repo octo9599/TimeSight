@@ -407,6 +407,31 @@ app.delete("/gruppe_user", async (req, res) => {
   }
 });
 
+//Delete an invite-request
+app.delete("/beitritt_anfrage/:anfrage_id", async (req, res) => {
+  const { anfrage_id } = req.params;
+
+  try {
+    if(!anfrage_id) {
+      return res.status(400).json({ error: "anfrage_id is required to delete an invite-request" });
+    }
+
+    const result = await runQuery(
+      "DELETE FROM Beitritt_Anfrage WHERE pk_anfrage_id = ?",
+      [anfrage_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Invite-request not found" });
+    }
+
+    res.status(200).json({ message: "Invite-request deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete invite-request" });
+  }
+});
+
 //Delete a task
 app.delete("/termin/:termin_id", async (req, res) => {
   const { termin_id } = req.params;
