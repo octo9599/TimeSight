@@ -382,6 +382,31 @@ app.delete("/gruppe/:group_id", async (req, res) => {
   }
 });
 
+//Remove user from group
+app.delete("/gruppe_user", async (req, res) => {
+  const { user_id, group_id } = req.query;
+
+  try {
+    if(!user_id || !group_id) {
+      return res.status(400).json({ error: "user_id and group_id are required to remove a user from a group" });
+    }
+
+    const result = await runQuery(
+      "DELETE FROM Gruppe_User WHERE fk_user_id = ? AND fk_group_id = ?",
+      [user_id, group_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found in group" });
+    }
+
+    res.status(200).json({ message: "User removed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to remove user" });
+  }
+});
+
 
 
 //Define on which port the backend runs.
