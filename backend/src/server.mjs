@@ -215,6 +215,27 @@ app.post("/gruppe", async (req, res) => {
   }
 });
 
+//Create a new User
+app.post("/user", async (req, res) => {
+  const { username, email, passwort } = req.body;
+
+  if (!username || !email || !passwort) {
+    return res.status(400).json({ error: "username, email and passwort are required to create a user." });
+  }
+
+  try {
+    const result = await runQuery(
+      //User (pk_user_id, username, email, passwort)
+      "INSERT INTO User VALUES (null, ?, ?, ?)",
+      [username, email, passwort]
+    );
+
+    res.status(201).json({ id: Number(result.insertId), username: username, email: email: passwort: passwort });
+  } catch {
+    res.status(500).json({ error: "Failed to create user" });
+  }
+});
+
 //Insert a User into a Group
 app.post("/gruppe_user", async (req, res) => {
   const { markierungsfarbe, ist_admin, kann_bearbeiten, kann_loeschen, group_id, user_id } = req.body;
