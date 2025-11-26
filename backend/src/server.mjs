@@ -325,7 +325,7 @@ app.post("/beitritt_anfrage", async (req, res) => {
 
 //DELETEs (remove Data)
 
-//Delete a User
+//Delete a user
 app.delete("/user/:user_id", async (req, res) => {
   const { user_id } = req.params;
 
@@ -350,6 +350,35 @@ app.delete("/user/:user_id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+//Delete a group
+app.delete("/gruppe/:group_id", async (req, res) => {
+  const { group_id } = req.params;
+
+  try {
+    if(!group_id) {
+      return res.status(400).json({ error: "group_id is required to delete a group" });
+    }
+
+    await runQuery("DELETE FROM Termin WHERE fk_group_id = ?", [group_id]);
+    await runQuery("DELETE FROM Gruppe_User WHERE fk_group_id = ?", [group_id]);
+    await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
+
+    const result = await runQuery(
+      "DELETE FROM Gruppe WHERE pk_group_id = ?",
+      [group_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    res.status(200).json({ message: "Group deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete Group" });
   }
 });
 
