@@ -174,7 +174,21 @@ app.get("/gruppe/:group_id/user", async (req, res) => {
     }
 });
 
-//view all invite-requests of a group
+//get a specific invite_request through an anfrage_id
+app.get("/beitritt_anfrage", async (req, res) => {
+    try {
+        const {anfrage_id} = req.params;
+        if(!anfrage_id) {
+          return res.status(400).json({ error: "anfrage_id is required for viewing an invite-request"});
+        }
+        const rows = await runQuery("SELECT * FROM Beitritt_Anfrage WHERE pk_anfrage_id = ?", [anfrage_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch users"})
+    }
+});
+
+//get all invite-requests of a group
 app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
     try {
         const {group_id} = req.params;
