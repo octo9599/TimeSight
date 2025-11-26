@@ -44,15 +44,33 @@ app.get("/", (req, res) => {
   res.json({ message: "API is running!" });
 });
 
-//Get tasks, either per group or per group and date. Lists completed tasks if 'ist_erledigt=1' is in query, otherwise only lists uncompleted tasks.
-//Only lists uncompleted past due exams if 'is_past_due=1* is in query.
+//Get a task through an id
 app.get("/termin", async (req, res) => {
   try {
-    const {group_id, datum, is_past_due, ist_erledigt} = req.query;
-    if(!group_id) {
-        return res.status(400).json({ error: "group_id is required for viewing tasks"});
+    const {termin_id} = req.params;
+    if(!termin_id) {
+        return res.status(400).json({ error: "termin_id is required for viewing a task"});
     }
-    let sql = "SELECT *, CURDATE() FROM Termin WHERE fk_group_id = ?";
+    let sql = "SELECT * FROM Termin WHERE pk_termin_id = ?";
+    const params = [termin_id];
+    const rows = await runQuery(sql, params);
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
+});
+
+//Get tasks of a group. Has the option to list tasks of a specific date. 
+//Lists completed tasks if 'ist_erledigt=1' is in query, otherwise only lists uncompleted tasks.
+//Only lists uncompleted past due exams if 'is_past_due=1' is in query.
+app.get("/group/:group_id/termin", async (req, res) => {
+  try {
+    const {group_id} = req.params;
+    const {datum, is_past_due, ist_erledigt} = req.query;
+    if(!group_id) {
+        return res.status(400).json({ error: "group_id is required for viewing tasks of a group"});
+    }
+    let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
     const params = [group_id];
 
     if(is_past_due == 1) {
@@ -80,7 +98,8 @@ app.get("/termin", async (req, res) => {
 //Get a group, either through group_id or per invite_code
 app.get("/gruppe", async (req, res) => {
     try {
-        const {group_id, invite_code} = req.query;
+        const {invite_code} = req.query;
+        const {group_id} = req.params;
         let sql = "SELECT * FROM Gruppe";
         const params = [];
         if(group_id) {
