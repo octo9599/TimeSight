@@ -573,7 +573,7 @@ app.patch("/termin/:termin_id", async (req, res) => {
   const sql = `
     UPDATE Termin
     SET ${columns.join(", ")}
-    WHERE pk_group_id = ?
+    WHERE pk_termin_id = ?
   `;
 
   try {
@@ -587,6 +587,51 @@ app.patch("/termin/:termin_id", async (req, res) => {
   } catch (err) {
     console.error("PATCH ERROR:", err);
     res.status(500).json({ error: "Failed to update Task" });
+  }
+});
+
+//partially update a users group-rights or their chosen group-colour
+app.patch("/gruppe_user", async (req, res) => {
+  const { group_id, user_id } = req.query;
+  const updates = req.body;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No fields provided for update" });
+  }
+
+  const columns = [];
+  const values = [];
+
+  for (const key in updates) {
+    if(key != "fk_group_id" && key != "fk_user_id") {
+      columns.push(`${key} = ?`);
+      values.push(updates[key]);
+    } else {
+      return res.status(400).json({ error: "Updates to attributes which form a primary key are not allowed." });
+    }
+  }
+
+  // for WHERE clause
+  values.push(group_id);
+  values.push(user_id);
+
+  const sql = `
+    UPDATE Gruppe_User
+    SET ${columns.join(", ")}
+    WHERE fk_group_id = ? AND fk_user_id = ?
+  `;
+
+  try {
+    const result = await runQuery(sql, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Group-User entry not found" });
+    }
+
+    res.json({ message: "Group-User entry updated successfully" });
+  } catch (err) {
+    console.error("PATCH ERROR:", err);
+    res.status(500).json({ error: "Failed to update Group-User entry" });
   }
 });
 
