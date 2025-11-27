@@ -31,7 +31,7 @@ async function runQuery(query, params = []) {
     console.error("Database error:", err);
     throw err;
   } finally {
-    if (conn) conn.release();
+    if (conn) await conn.release();
   }
 }
 
@@ -71,9 +71,9 @@ app.get("/group/:group_id/termin", async (req, res) => {
     let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
     const params = [group_id];
 
-    if(is_past_due == 1) {
+    if(is_past_due === 1) {
       sql += " AND ist_erledigt = false AND datum < CURDATE()";
-    } else if(ist_erledigt == 1) {
+    } else if(ist_erledigt === 1) {
       sql += " AND ist_erledigt = true"; 
     } else {
       sql += " AND datum >= CURDATE() AND ist_erledigt = false";
