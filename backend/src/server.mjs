@@ -459,6 +459,51 @@ app.delete("/termin/:termin_id", async (req, res) => {
 
 
 
+//PATCHes (partially update data / UPDATE )
+
+//partially update a user
+app.patch("/users/:user_id", async (req, res) => {
+  const { user_id } = req.params;
+  const updates = req.body;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No fields provided for update" });
+  }
+
+  const columns = [];
+  const values = [];
+
+  for (const key in updates) {
+    if(key != "pk_user_id") {
+      columns.push(`${key} = ?`);
+      values.push(updates[key]);
+    }
+  }
+
+  values.push(user_id); // for WHERE clause
+
+  const sql = `
+    UPDATE User
+    SET ${columns.join(", ")}
+    WHERE user_id = ?
+  `;
+
+  try {
+    const result = await runQuery(sql, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ message: "User updated successfully" });
+  } catch (err) {
+    console.error("PATCH ERROR:", err);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+
+
 //Define on which port the backend runs.
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
