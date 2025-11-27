@@ -462,7 +462,7 @@ app.delete("/termin/:termin_id", async (req, res) => {
 //PATCHes (partially update data / UPDATE )
 
 //partially update a user
-app.patch("/users/:user_id", async (req, res) => {
+app.patch("/user/:user_id", async (req, res) => {
   const { user_id } = req.params;
   const updates = req.body;
 
@@ -477,6 +477,8 @@ app.patch("/users/:user_id", async (req, res) => {
     if(key != "pk_user_id") {
       columns.push(`${key} = ?`);
       values.push(updates[key]);
+    } else {
+      return res.status(400).json({ error: "Updates to the primary key are not allowed." });
     }
   }
 
@@ -485,7 +487,7 @@ app.patch("/users/:user_id", async (req, res) => {
   const sql = `
     UPDATE User
     SET ${columns.join(", ")}
-    WHERE user_id = ?
+    WHERE pk_user_id = ?
   `;
 
   try {
@@ -499,6 +501,49 @@ app.patch("/users/:user_id", async (req, res) => {
   } catch (err) {
     console.error("PATCH ERROR:", err);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+//partially update a group
+app.patch("/gruppe/:group_id", async (req, res) => {
+  const { group_id } = req.params;
+  const updates = req.body;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No fields provided for update" });
+  }
+
+  const columns = [];
+  const values = [];
+
+  for (const key in updates) {
+    if(key != "pk_group_id" && key != "invite_code") {
+      columns.push(`${key} = ?`);
+      values.push(updates[key]);
+    } else {
+      return res.status(400).json({ error: "Updates to the primary key or the invite_code are not allowed." });
+    }
+  }
+
+  values.push(group_id); // for WHERE clause
+
+  const sql = `
+    UPDATE Gruppe
+    SET ${columns.join(", ")}
+    WHERE pk_group_id = ?
+  `;
+
+  try {
+    const result = await runQuery(sql, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    res.json({ message: "Group updated successfully" });
+  } catch (err) {
+    console.error("PATCH ERROR:", err);
+    res.status(500).json({ error: "Failed to update group" });
   }
 });
 
