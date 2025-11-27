@@ -61,7 +61,7 @@ app.get("/termin/:termin_id", async (req, res) => {
 //Get tasks of a group. Has the option to list tasks of a specific date. 
 //Lists completed tasks if 'ist_erledigt=1' is in query, otherwise only lists uncompleted tasks.
 //Only lists uncompleted past due exams if 'is_past_due=1' is in query.
-app.get("/group/:group_id/termin", async (req, res) => {
+app.get("/gruppe/:group_id/termin", async (req, res) => {
   try {
     const {group_id} = req.params;
     const {datum, is_past_due, ist_erledigt} = req.query;
