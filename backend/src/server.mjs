@@ -82,9 +82,8 @@ app.get("/gruppe/:group_id/termin", async (req, res) => {
     if(datum) {
         sql += " AND datum = ?";
         params.push(datum);
-    } else {
-        sql += " ORDER BY datum, bezeichnung"
     }
+    sql += " ORDER BY datum, bezeichnung";
 
     const rows = await runQuery(sql, params);
     res.json(rows);
