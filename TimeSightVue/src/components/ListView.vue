@@ -33,8 +33,6 @@
             doneTermine = doneTermineIn.data;            
         }
         console.log(toDoTermine);
-        console.log(overTermineIn);
-        console.log(doneTermineIn);
     } catch (err){
         console.log(err);
     };
