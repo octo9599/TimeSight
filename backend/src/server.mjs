@@ -262,7 +262,7 @@ app.post("/user", async (req, res) => {
   try {
     const result = await runQuery(
       //User (pk_user_id, username, email, passwort)
-      "INSERT INTO User VALUES (null, ?, ?, ?)",
+      "INSERT INTO User VALUES (null, ?, ?, SHA2(?,256))",
       [username, email, passwort]
     );
 
