@@ -148,6 +148,34 @@ app.get("/user/:user_id", async (req, res) => {
     }
 });
 
+//Get a user through username, e-mail or passwort
+app.get("/user", async (req, res) => {
+    try {
+        const {username, email, passwort } = req.query;
+        let sql = "SELECT * FROM User WHERE ";
+        const params = [];
+        if(username || email) {
+            if(email) {
+              sql += "email = ?";
+              params.push(email);
+            } else if(username) {
+              sql += "username = ?";
+              params.push(username);
+            }
+            if(passwort) {
+              sql += " AND passwort = SHA2(?, 256)";
+              params.push(passwort);
+            }
+        } else {
+            res.status(400).json({ error: "either username or e-mail are required to view a user without it's user_id." })
+        }
+        const rows = await runQuery(sql, params);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch user"})
+    }
+});
+
 //Get the group-rights of a user through a user_id and a group_id
 app.get("/gruppe_user", async (req, res) => {
     try {
