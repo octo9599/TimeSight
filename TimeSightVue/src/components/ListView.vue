@@ -26,12 +26,18 @@
             doneTermineIn.push(await axios.get(`${API}/gruppe/${group}/termin`, {
 		    params: {
 			    ist_erledigt: 1,
-		    }}));
-
-            toDoTermine.push(toDoTermineIn.data);
-            overTermine = overTermineIn.data;
-            doneTermine = doneTermineIn.data;            
+		    }}));          
         }
+        for (const termin of toDoTermineIn) {
+            toDoTermine.push(termin.data);
+        }
+        for (const termin of overTermineIn) {
+            overTermine.push(termin.data);
+        }
+        for (const termin of doneTermineIn) {
+            doneTermine.push(termin.data);
+        }
+        console.log(groupsData);
         console.log(toDoTermine);
     } catch (err){
         console.log(err);
