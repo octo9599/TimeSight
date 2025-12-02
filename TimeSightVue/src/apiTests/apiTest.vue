@@ -74,15 +74,7 @@ async function test() {
     print((await axios.get(`${API}/termin/${termin_id}`)).data);
 
     print("GET termin by filters:");
-    print(
-      (await axios.get(`${API}/gruppe/${group_id}/termin`, {
-        params: {
-          datum: "2025-01-01",
-          is_past_due: 1,
-          ist_erledigt: 1
-        }
-      })).data
-    );
+    print((await axios.get(`${API}/gruppe/${group_id}/termin`, { params: { is_past_due: 1 } })).data);
 
     print("GET group:");
     print((await axios.get(`${API}/gruppe/${group_id}`)).data);
@@ -90,7 +82,7 @@ async function test() {
     print("GET group by invite code:");
     print(
       (await axios.get(`${API}/gruppe`, {
-        params: { invite_code: "ABC123" }
+        params: { invite_code: "ABCDEF" }
       })).data
     );
 
