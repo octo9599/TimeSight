@@ -71,9 +71,9 @@ app.get("/gruppe/:group_id/termin", async (req, res) => {
     let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
     const params = [group_id];
 
-    if(is_past_due === 1) {
+    if(is_past_due == 1) {
       sql += " AND ist_erledigt = false AND datum < CURDATE()";
-    } else if(ist_erledigt === 1) {
+    } else if(ist_erledigt == 1) {
       sql += " AND ist_erledigt = true"; 
     } else {
       sql += " AND datum >= CURDATE() AND ist_erledigt = false";
@@ -148,13 +148,13 @@ app.get("/user/:user_id", async (req, res) => {
     }
 });
 
-//Get a user through username, e-mail or passwort
+//Get a user through username or e-mail and passwort
 app.get("/user", async (req, res) => {
     try {
         const {username, email, passwort } = req.query;
         let sql = "SELECT * FROM User WHERE ";
         const params = [];
-        if(username || email) {
+        if((username || email) && passwort) {
             if(email) {
               sql += "email = ?";
               params.push(email);
@@ -162,12 +162,10 @@ app.get("/user", async (req, res) => {
               sql += "username = ?";
               params.push(username);
             }
-            if(passwort) {
-              sql += " AND passwort = SHA2(?, 256)";
-              params.push(passwort);
-            }
+            sql += " AND passwort = SHA2(?, 256)";
+            params.push(passwort);
         } else {
-            res.status(400).json({ error: "either username or e-mail are required to view a user without it's user_id." })
+            res.status(400).json({ error: "either username or e-mail and password are required to view a user without it's user_id." })
         }
         const rows = await runQuery(sql, params);
         res.json(rows);

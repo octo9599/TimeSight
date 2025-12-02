@@ -1,11 +1,13 @@
-<script setup lang="ts">
+<script setup>
 import SideBar from "@/components/SideBar.vue";
 import TopBar from "@/components/TopBar.vue";
+//import apiTest from "./apiTests/apiTest.vue";
 </script>
 
 <template>
   <TopBar/>
   <SideBar/>
+  <!-- <apiTest/> -->
 </template>
 
 <style scoped>
