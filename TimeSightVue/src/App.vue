@@ -2,7 +2,7 @@
 import SideBar from "@/components/SideBar.vue";
 import TopBar from "@/components/TopBar.vue";
 //import apiTest from "./apiTests/apiTest.vue";
-//import ListView from "./components/ListView.vue";
+import ListView from "./components/ListView.vue";
 </script>
 
 <template>
@@ -10,6 +10,8 @@ import TopBar from "@/components/TopBar.vue";
   <div id="horizontal-container">
     <SideBar/>
   </div>
+  <!-- <ListView/> -->
+  <ListView/>
   <!-- <apiTest/> -->
 </template>
 
