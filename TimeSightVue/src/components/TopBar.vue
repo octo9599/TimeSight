@@ -6,7 +6,7 @@
   <div id="topbar-container">
     <!-- actual app icon will go here once available-->
     <a href="/">
-      <img class="icons" id="eye-icon" src="../assets/images/TEMPORARY-Logo-Icon.png" alt="TimeSight Logo">
+      <img class="icons" id="eye-icon" src="@/assets/images/Logo.png" alt="TimeSight Logo">
     </a>
     <h1><span class="highlighted">T</span>ime<span class="highlighted">S</span>ight</h1> <!-- janky but working way to make T and S colored differently -->
     <!-- actual account icon will go here once available-->
@@ -32,12 +32,24 @@ span.highlighted {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: #001033 ;
+  background-color: var(--main-dark);
+  border-bottom: 3px var(--text-dark) solid;
 }
 
-img.icons {
+/*img.icons {
+  margin: 0 15px;
+}*/
+
+#acc-icon {
   width: max-content;
   height: max-content;
-  margin: 0 15px;
+  margin: 0 10px;
 }
+
+#eye-icon {
+  height: min-content;
+  width: 149px;
+  margin: 0 10px;
+}
+
 </style>
