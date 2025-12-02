@@ -7,8 +7,9 @@ import TopBar from "@/components/TopBar.vue";
 
 <template>
   <TopBar/>
-  <SideBar/>
-  <!-- <ListView/> -->
+  <div id="horizontal-container">
+    <SideBar/>
+  </div>
   <!-- <apiTest/> -->
 </template>
 
@@ -17,5 +18,11 @@ import TopBar from "@/components/TopBar.vue";
 @font-face {
   font-family: JockeyOne;
   src: url('@/assets/fonts/JockeyOne-Regular.ttf');
+}
+
+#horizontal-container {
+  display: flex;
+  flex-direction: row;
+
 }
 </style>
