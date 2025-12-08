@@ -1,14 +1,16 @@
-:root{
-  --text-light: #001033;
-  --text-dark: #DBF1FF;
-  --main-dark: #001033;
-  --main-light: #DBF1FF;
-  --field-light: #9CBCD3;
-  --field-dark: #13464E;
-  --accent-light: #008888;
-  --accent-dark: #009999;
-  --done-light: #5CC0A1;
-  --done-dark: #188064;
-  --today-light: #3256AB;
-  --today-dark: #568AC8;
+:root {
+	--text-light: #001033;
+	--text-dark: #DBF1FF;
+	--main-dark: #001033;
+	--main-light: #DBF1FF;
+	--field-light: #9CBCD3;
+	--field-dark: #13464E;
+	--accent-light: #008888;
+	--accent-dark: #009999;
+	--done-light: #5CC0A1;
+	--done-dark: #188064;
+	--today-light: #3256AB;
+	--today-dark: #568AC8;
 }
+
+* {box-sizing: border-box;}
