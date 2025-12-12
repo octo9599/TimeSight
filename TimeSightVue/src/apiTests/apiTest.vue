@@ -92,12 +92,6 @@ async function test() {
     print("GET user:");
     print((await axios.get(`${API}/user/${user_id}`)).data);
 
-    print("GET user by username/email and passwort:");
-    print((await axios.get(`${API}/user`, {
-      params: {username: "john", passwort: "1234"}
-    })).data
-    );
-
     print("GET Gruppe_User:");
     print(
       (await axios.get(`${API}/gruppe_user`, {
