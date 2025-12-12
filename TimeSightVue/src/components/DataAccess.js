@@ -27,6 +27,8 @@ export async function fetchData() {
         for (const termin of [...toDoTermine, ...overTermine, ...doneTermine]) {
             datesIn.add(termin.datum);
         }
+        datesIn = Array.from(datesIn);
+        datesIn.sort();
         for (const date of datesIn) {
             dates.push(new Date(date))
         }
@@ -36,4 +38,13 @@ export async function fetchData() {
         console.error(err);
         return { toDoTermine: [], overTermine: [], doneTermine: [], dates: new Set() };
     }
+}
+
+export function formatDate(date) {
+    const weekday = date.toLocaleDateString('de-DE', { weekday: 'short' }).toUpperCase();
+    const day = date.getDate();
+    const month = date.toLocaleDateString('de-DE', { month: 'long' });
+    const year = date.getFullYear();
+
+    return `${weekday}, ${day}. ${month} ${year}`;
 }
