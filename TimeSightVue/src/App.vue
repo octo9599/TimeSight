@@ -8,8 +8,10 @@ import ListView from "@/components/ListView.vue";
 <template>
 	<TopBar/>
 	<div id="horizontal-container">
-		<SideBar/>
-		<!-- #test is just for showing the correct bg-color currently, should be removed when work on calendar view begins   -->
+		<div id="sidebar">
+			<SideBar/>
+		</div>
+		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
 		<p id="test">Hello World this is a paragraph</p>
 	</div>
 	<!-- <ListView/> -->
@@ -25,15 +27,20 @@ import ListView from "@/components/ListView.vue";
 }
 
 #horizontal-container {
-	display: flex;
-	flex-direction: row;
-	height: 88vh;
+	display: grid;
+	grid-template-columns: 1.1fr 8.9fr;
+	height: 84vh;
+}
+
+#sidebar {
+	grid-column: 1;
 }
 
 #test {
-	width: 100%;
+	grid-column: 2;
 	background-color: var(--main-dark);
-	margin: 0;
 	color: var(--text-dark);
+	margin: 0;
 }
+
 </style>

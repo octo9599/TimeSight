@@ -20,23 +20,18 @@
 	align-items: center;
 	background-color: var(--main-dark);
 	border-right: 3px var(--text-dark) solid;
-	/*border-bottom: 3px white solid;*/
-	width: 200px;
+	width: 100%;
+	height: 100%;
 }
 
 img.icons {
-	height: 9%;
-	/*width: 70%;*/
-	margin: auto 25px;
-	padding: 0 20px;
-}
-
-#sidebar-container > img {
-
+	max-width: 55%;
+	height: auto;
+	margin: auto 2%;
 }
 
 hr {
-	width: 100%;
+	width: 85%;
 }
 
 #sidebar-container {
