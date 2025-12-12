@@ -5,7 +5,9 @@
 </script>
 
 <template>
-
+    <p>
+        Login
+    </p>
 </template>
 
 <style scoped>
