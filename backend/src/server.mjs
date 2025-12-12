@@ -2,12 +2,18 @@ import express from "express";
 import cors from "cors";
 import mariadb from "mariadb";
 import dotenv from "dotenv";
+import crypto from "crypto";
+import auth from "./auth.js";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
 //initialize app
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 
 
@@ -148,30 +154,54 @@ app.get("/user/:user_id", async (req, res) => {
     }
 });
 
-//Get a user through username or e-mail and passwort
-app.get("/user", async (req, res) => {
+//Login Route which does some crazy chatgpt-recommended security stuff
+// (i wish i had the time to learn this shit fr)
+app.post("/login", async (req, res) => {
     try {
-        const {username, email, passwort } = req.query;
-        let sql = "SELECT * FROM User WHERE ";
+        const {email, passwort } = req.body;
+        let sql = "SELECT * FROM User WHERE email = ?";
         const params = [];
-        if((username || email) && passwort) {
-            if(email) {
-              sql += "email = ?";
-              params.push(email);
-            } else if(username) {
-              sql += "username = ?";
-              params.push(username);
+        if(email && passwort) {
+            const rows = await runQuery(sql, email);
+            const user = rows[0];
+            const hashedPW = crypto.createHash("sha256").update(passwort).digest("hex");
+
+            if(!user || user.passwort != hashedPW) {
+                return res.status(401).json({ error: "Invalid email or password" });
             }
-            sql += " AND passwort = SHA2(?, 256)";
-            params.push(passwort);
+
+            const token = jwt.sign(
+              { userId: user.pk_user_id },
+              process.env.JWT_SECRET,
+              { expiresIn: "7d" }
+            );
+
+            res.cookie("auth", token, {
+              httpOnly: true,
+              secure: false,
+              sameSite: "lax",
+              maxAge: 1000 * 60 * 60 * 24 * 7
+            });
+
+           return res.json({ message: "Login successful", userId: user.pk_user_id});
         } else {
-            res.status(400).json({ error: "either username or e-mail and password are required to view a user without it's user_id." })
+            res.status(400).json({ error: "e-mail and password are required to view a user without it's user_id." })
         }
-        const rows = await runQuery(sql, params);
-        res.json(rows);
-    } catch {
-        res.status(500).json({error: "Failed to fetch user"})
+    } catch (err) {
+        res.status(500).json({message: "Failed to fetch user", error: err.toString() })
     }
+});
+
+//get the currently logged in user in a secure way
+app.get("/me", auth, async (req, res) => {
+  const rows = await runQuery("SELECT * FROM User WHERE pk_user_id = ?", [req.userId]);
+  res.json(rows[0]);
+});
+
+//logout route, which removes the cookie that houses the users login data
+app.post("/logout", (req, res) => {
+  res.clearCookie("auth");
+  res.json({ message: "Logged out" });
 });
 
 //Get the group-rights of a user through a user_id and a group_id
@@ -184,7 +214,7 @@ app.get("/gruppe_user", async (req, res) => {
         const rows = await runQuery("SELECT * FROM Gruppe_User WHERE fk_group_id = ? AND fk_user_id = ?", [group_id, user_id]);
         res.json(rows);
     } catch {
-        res.status(500).json({error: "Failed to fetch users"})
+        res.status(500).json({error: "Failed to fetch users"});
     }
 });
 
