@@ -1,0 +1,39 @@
+import axios from 'axios';
+const API = "http://localhost:3000";
+
+export async function fetchData() {
+    try {
+        const groupsIn = await axios.get(`${API}/user/1/gruppe`);
+        const groups = groupsIn.data.map(group => group.pk_group_id);
+
+        let toDoTermine = [];
+        let overTermine = [];
+        let doneTermine = [];
+
+        for (const group of groups) {
+            const [toDoIn, overIn, doneIn] = await Promise.all([
+                axios.get(`${API}/gruppe/${group}/termin`),
+                axios.get(`${API}/gruppe/${group}/termin`, { params: { is_past_due: 1 } }),
+                axios.get(`${API}/gruppe/${group}/termin`, { params: { ist_erledigt: 1 } })
+            ]);
+
+            toDoTermine.push(...toDoIn.data);
+            overTermine.push(...overIn.data);
+            doneTermine.push(...doneIn.data);
+        }
+
+        let datesIn = new Set();
+        let dates = [];
+        for (const termin of [...toDoTermine, ...overTermine, ...doneTermine]) {
+            datesIn.add(termin.datum);
+        }
+        for (const date of datesIn) {
+            dates.push(new Date(date))
+        }
+
+        return { toDoTermine, overTermine, doneTermine, dates };
+    } catch (err) {
+        console.error(err);
+        return { toDoTermine: [], overTermine: [], doneTermine: [], dates: new Set() };
+    }
+}
