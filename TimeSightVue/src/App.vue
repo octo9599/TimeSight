@@ -5,27 +5,6 @@
 
 	import { useUserStore } from "./stores/user";
 
-	import { onMounted } from "vue";
-	import { useRouter } from "vue-router";
-
-	const router = useRouter();
-	const userStore = useUserStore();
-
-	onMounted( () => {
-		authorize_token();
-	});
-
-	async function authorize_token() {
-
-		if(!userStore.user) {
-			await userStore.fetchUser();
-			if(userStore.user == null) {
-				router.push("/auth");
-			}
-		}
-
-	}
-
 </script>
 
 <template>
