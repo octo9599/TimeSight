@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 
 function auth(req, res, next) {
   const cookies = {};
+  if(!req.headers.cookie) { 
+    return res.status(401).json({ error: "Cookies not yet created."})
+  }
   req.headers.cookie.split("; ").forEach(element => {
       const [key, value] = element.split("=");
       cookies[key] = value;
