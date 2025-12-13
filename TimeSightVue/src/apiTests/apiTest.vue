@@ -44,6 +44,7 @@ async function test() {
       bezeichnung: "Homework",
       beschreibung: "Math exercises",
       datum: "2025-01-01",
+      uhrzeit: "23:59",
       group_id,
       user_id
     });

@@ -24,6 +24,7 @@ const pool = mariadb.createPool({
   password: process.env.DB_PASS || "root",
   database: process.env.DB_NAME || "TimeSight",
   connectionLimit: 5,
+  dateStrings: true,
 });
 
 //function for executing sql statements cleanly and safely.
@@ -267,20 +268,21 @@ app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
 
 //Create a new Task
 app.post("/termin", async (req, res) => {
-  const { bezeichnung, beschreibung, datum, group_id, user_id } = req.body;
+  const { bezeichnung, beschreibung, datum, uhrzeit, group_id, user_id } = req.body;
 
-  if (!bezeichnung || !beschreibung || !datum || !group_id || !user_id) {
-    return res.status(400).json({ error: "bezeichnung, beschreibung, datum, group_id and user_id are required to create a task." });
+  if (!bezeichnung || !beschreibung || !datum || !uhrzeit || !group_id || !user_id) {
+    return res.status(400).json({ error: "bezeichnung, beschreibung, datum, uhrzeit, group_id and user_id are required to create a task." });
   }
 
   try {
+    let date_time = `${datum} ${uhrzeit}:00`;
     const result = await runQuery(
       //Termin (pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
       "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
-      [bezeichnung, beschreibung, datum, group_id, user_id]
+      [bezeichnung, beschreibung, date_time, group_id, user_id]
     );
 
-    res.status(201).json({ id: Number(result.insertId), beschreibung: beschreibung, bezeichnung: bezeichnung, datum: datum, fk_group_id: group_id, fk_ersteller_id: user_id });
+    res.status(201).json({ id: Number(result.insertId), beschreibung: beschreibung, bezeichnung: bezeichnung, datum: date_time, fk_group_id: group_id, fk_ersteller_id: user_id });
   } catch {
     res.status(500).json({ error: "Failed to create task" });
   }
@@ -623,7 +625,7 @@ app.patch("/termin/:termin_id", async (req, res) => {
     }
   }
 
-  values.push(termin_id); // for WHERE clause
+  values.push(termin_id);
 
   const sql = `
     UPDATE Termin
