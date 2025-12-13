@@ -1,12 +1,14 @@
 import {createRouter, createWebHistory, type Router} from 'vue-router'
-import App from "@/App.vue";
+import ListPage from '@/ListPage.vue';
+import AuthPage from '@/AuthPage.vue';
 
 const router: Router = createRouter({
   // would be used if the root of the app is not stored at /
   // history: createWebHistory(import.meta.env.BASE_URL),
   history: createWebHistory(),
   routes: [
-    {path: "/", component: App}
+    {path: "/", component: ListPage},
+    {path: "/auth", component: AuthPage}
   ],
 })
 
