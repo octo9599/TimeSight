@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { onMounted } from 'vue';
 const API = "http://localhost:3000";
 
 export async function fetchData() {
@@ -33,10 +34,10 @@ export async function fetchData() {
             dates.push(new Date(date))
         }
 
-        return { toDoTermine, overTermine, doneTermine, dates };
+        return { groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
     } catch (err) {
         console.error(err);
-        return { toDoTermine: [], overTermine: [], doneTermine: [], dates: new Set() };
+        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: new Set ,dates: [] };
     }
 }
 
@@ -47,4 +48,9 @@ export function formatDate(date) {
     const year = date.getFullYear();
 
     return `${weekday}, ${day}. ${month} ${year}`;
+}
+
+export function getTermineByDate(termine, date) {
+    return termine
+    .filter(t => t.datum.startsWith(date))
 }
