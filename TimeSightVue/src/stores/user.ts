@@ -8,7 +8,7 @@ export const useUserStore = defineStore("user", () => {
     async function fetchUser() {
         try {
             const res = await axios.get(`http://localhost:3000/me`, {
-            withCredentials: true
+                withCredentials: true
             });
             user.value = res.data;
         } catch {
