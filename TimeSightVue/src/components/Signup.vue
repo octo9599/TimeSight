@@ -1,6 +1,7 @@
-<script setup lang="ts">
+<script setup>
     import axios from 'axios';
     import { ref } from 'vue';
+    import { useUserStore } from '@/stores/user';
 
     const API = "http://localhost:3000";
 
@@ -8,6 +9,9 @@
     const email = ref("");
     const password = ref("");
     const password_check = ref("");
+
+    const userStore = useUserStore();
+
     async function signupSubmit() {
 
         console.log(username.value)
@@ -32,9 +36,11 @@
                 passwort: password.value 
             }, { withCredentials: true });
 
+            userStore.fetchUser().then(() => {if(userStore.user) { console.log(userStore.user.pk_user_id); }}); 
+
             console.log(signup.data)
             console.log(login.data);
-            return signup.data;
+            window.location.reload();
 
         } catch (err) {
             console.log(err);
