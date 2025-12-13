@@ -1,8 +1,31 @@
 <script setup>
-import SideBar from "@/components/SideBar.vue";
-import TopBar from "@/components/TopBar.vue";
-//import apiTest from "@/apiTests/apiTest.vue";
-import ListView from "@/components/ListView.vue";
+	import SideBar from "@/components/SideBar.vue";
+	import TopBar from "@/components/TopBar.vue";
+	import logoutTest from "./apiTests/logoutTest.vue";
+
+	import { useUserStore } from "./stores/user";
+
+	import { onMounted } from "vue";
+	import { useRouter } from "vue-router";
+
+	const router = useRouter();
+	const userStore = useUserStore();
+
+	onMounted( () => {
+		authorize_token();
+	});
+
+	async function authorize_token() {
+
+		if(!userStore.user) {
+			await userStore.fetchUser();
+			if(userStore.user == null) {
+				router.push("/auth");
+			}
+		}
+
+	}
+
 </script>
 
 <template>
@@ -12,11 +35,11 @@ import ListView from "@/components/ListView.vue";
 			<SideBar/>
 		</div>
 		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
-		<p id="test">Hello World this is a paragraph</p>
+		<!--<p id="test">Hello World this is a paragraph</p>-->
+		<div>
+			<RouterView />
+		</div>
 	</div>
-	<!-- <ListView/> -->
-	<ListView/>
-	<!-- <apiTest/> -->
 </template>
 
 <style scoped>
