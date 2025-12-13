@@ -3,7 +3,12 @@
 const jwt = require("jsonwebtoken");
 
 function auth(req, res, next) {
-  const token = req.cookies.auth;
+  const cookies = {};
+  req.headers.cookie.split("; ").forEach(element => {
+      const [key, value] = element.split("=");
+      cookies[key] = value;
+  });
+  const token = cookies.auth;
   if (!token) return res.status(401).json({ error: "Not logged in" });
 
   try {
