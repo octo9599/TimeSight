@@ -1,39 +1,21 @@
 <script setup>
-	import SideBar from "@/components/SideBar.vue";
-	import TopBar from "@/components/TopBar.vue";
-	import logoutTest from "./apiTests/logoutTest.vue";
-  import { onMounted } from "vue";
-  import { useRouter } from "vue-router";
-
-	import { getUserStore, getUserToken, user } from '@/components/DataAccess.mjs';
-
-  const router = useRouter();
-
-  onMounted( async () => {
-    getUserStore();
-    await getUserToken();
-    console.log(user);
-    if(user) {
-      console.log("login success:", user);
-      router.push("/");
-    } else {
-      router.push("/auth");
-      console.log("redirect to /auth");
-    }
-  });
-
+import SideBar from "@/components/SideBar.vue";
+import TopBar from "@/components/TopBar.vue";
+import logoutTest from "./apiTests/logoutTest.vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
 </script>
 
 <template>
-	<TopBar/>
+	<TopBar />
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar/>
+			<SideBar />
 		</div>
 		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
 		<!--<p id="test">Hello World this is a paragraph</p>-->
-		<div>
-      <logoutTest/>
+		<div id="test">
+			<logoutTest />
 			<RouterView />
 		</div>
 	</div>
@@ -62,5 +44,4 @@
 	color: var(--text-dark);
 	margin: 0;
 }
-
 </style>
