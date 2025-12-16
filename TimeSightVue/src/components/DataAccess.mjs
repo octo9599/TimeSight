@@ -1,6 +1,26 @@
 import axios from 'axios';
-import { onMounted } from 'vue';
+import { useUserStore } from '@/stores/user.ts';
+import { pinia } from '@/main.ts';
 const API = "http://localhost:3000";
+
+let userStore;
+export let user;
+
+export function getUserStore() {
+
+    if(userStore === undefined) {
+        userStore = useUserStore(pinia);
+        console.log("createPinia");
+    }
+
+}
+
+export async function getUserToken() {
+
+    await userStore.fetchUser();
+    user = userStore.user;
+
+}
 
 export async function fetchData() {
     try {
