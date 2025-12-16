@@ -3,7 +3,7 @@ import axios from 'axios';
 const API = "http://localhost:3000";
 
 import { ref, onMounted, toRaw } from "vue";
-import { fetchData, formatDate, getTermineByDate } from "./DataAccess.js";
+import { fetchData, formatDate, getTermineByDate } from "./DataAccess.mjs";
 
 const toDoTermine = ref([]);
 const overTermine = ref([]);
