@@ -21,9 +21,6 @@
 
             const res = await axios.post(`${API}/login`, { email: email.value, passwort: password.value }, { withCredentials: true });
 
-            userStore.fetchUser().then(() => {if(userStore.user) { console.log(userStore.user.pk_user_id); }}); 
-
-            console.log(res.data);
             window.location.reload();
 
         } catch (err) {
