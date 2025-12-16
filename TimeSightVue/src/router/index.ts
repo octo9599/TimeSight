@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory, type Router} from 'vue-router'
 import ListPage from '@/ListPage.vue';
 import AuthPage from '@/AuthPage.vue';
+import { useUserStore } from '@/stores/user'
 import { getUserStore, getUserToken, user} from '@/components/DataAccess.mjs'
 
 const router: Router = createRouter({
@@ -14,15 +15,28 @@ const router: Router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  await getUserStore()
-  await getUserToken()
 
-  if (!user.value && to.path !== '/auth') {
-    return '/auth'
-  } else {
-    return '/'
+  const userStore = useUserStore();
+
+  // Fetch user only once
+  if (userStore.user === null) {
+    await userStore.fetchUser();
   }
-})
+
+  // Not logged in → going to protected route
+  if (!userStore.user && to.path !== '/auth') {
+    return '/auth';
+  }
+
+  //Logged in → trying to access auth page
+  if (userStore.user && to.path === '/auth') {
+    return '/';
+  }
+
+  //Allow navigation
+  return true;
+});
+
 
 
 export default router
