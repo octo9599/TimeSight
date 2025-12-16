@@ -8,6 +8,10 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is missing. Check your .env file.");
+}
+
 //initialize app
 const app = express();
 app.use(cors({
@@ -159,16 +163,15 @@ app.get("/user/:user_id", async (req, res) => {
 // (i wish i had the time to learn this shit fr)
 app.post("/login", async (req, res) => {
     try {
-        const {email, passwort } = req.body;
-        let sql = "SELECT * FROM User WHERE email = ?";
-        const params = [];
-        if(email && passwort) {
-            const rows = await runQuery(sql, email);
+        const {username, passwort } = req.body;
+        let sql = "SELECT * FROM User WHERE username = ?";
+        if(username && passwort) {
+            const rows = await runQuery(sql, username);
             const user = rows[0];
             const hashedPW = crypto.createHash("sha256").update(passwort).digest("hex");
 
             if(!user || user.passwort != hashedPW) {
-                return res.status(401).json({ error: "Invalid email or password" });
+                return res.status(401).json({ error: "Invalid username or password" });
             }
 
             const token = jwt.sign(
@@ -186,7 +189,7 @@ app.post("/login", async (req, res) => {
 
            return res.json({ message: "Login successful", userId: user.pk_user_id});
         } else {
-            res.status(400).json({ error: "e-mail and password are required to view a user without it's user_id." })
+            res.status(400).json({ error: "username and password are required to view a user without it's user_id." })
         }
     } catch (err) {
         res.status(500).json({message: "Failed to fetch user", error: err.toString() })
@@ -311,20 +314,20 @@ app.post("/gruppe", async (req, res) => {
 
 //Create a new User
 app.post("/user", async (req, res) => {
-  const { username, email, passwort } = req.body;
+  const { username, passwort } = req.body;
 
-  if (!username || !email || !passwort) {
-    return res.status(400).json({ error: "username, email and passwort are required to create a user." });
+  if (!username || !passwort) {
+    return res.status(400).json({ error: "username and passwort are required to create a user." });
   }
 
   try {
     const result = await runQuery(
-      //User (pk_user_id, username, email, passwort)
-      "INSERT INTO User VALUES (null, ?, ?, SHA2(?,256))",
-      [username, email, passwort]
+      //User (pk_user_id, username, passwort)
+      "INSERT INTO User VALUES (null, ?, SHA2(?,256))",
+      [username, passwort]
     );
 
-    res.status(201).json({ id: Number(result.insertId), username: username, email: email, passwort: passwort });
+    res.status(201).json({ id: Number(result.insertId), username: username, passwort: passwort });
   } catch {
     res.status(500).json({ error: "Failed to create user" });
   }
