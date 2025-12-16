@@ -1,32 +1,15 @@
 import axios from 'axios';
 import { useUserStore } from '@/stores/user.ts';
-import { pinia } from '@/main.ts';
 const API = "http://localhost:3000";
-
-let userStore;
-export let user;
-
-export function getUserStore() {
-
-    if(userStore === undefined) {
-        userStore = useUserStore(pinia);
-        console.log("createPinia");
-    }
-
-}
-
-export async function getUserToken() {
-
-    await userStore.fetchUser();
-    user = userStore.user;
-
-}
 
 export async function fetchData() {
     try {
-        if (user == undefined) {
-            throw new Error();
+        const userStore = useUserStore();
+
+        if (!userStore.user) {
+            throw new Error('User not initialized');
         }
+
         const groupsIn = await axios.get(`${API}/user/1/gruppe`);
         const groups = groupsIn.data.map(group => group.pk_group_id);
 
@@ -57,10 +40,10 @@ export async function fetchData() {
             dates.push(new Date(date))
         }
 
-        return { user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
+        return { user: userStore.user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
     } catch (err) {
         console.error(err);
-        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: new Set ,dates: [] };
+        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: new Set, dates: [] };
     }
 }
 
@@ -75,5 +58,5 @@ export function formatDate(date) {
 
 export function getTermineByDate(termine, date) {
     return termine
-    .filter(t => t.datum.startsWith(date))
+        .filter(t => t.datum.startsWith(date))
 }
