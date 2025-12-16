@@ -6,7 +6,6 @@
     const API = "http://localhost:3000";
 
     const username = ref("");
-    const email = ref("");
     const password = ref("");
     const password_check = ref("");
 
@@ -15,7 +14,6 @@
     async function signupSubmit() {
 
         console.log(username.value)
-        console.log(email.value);
         console.log(password.value);
 
         let user;
@@ -27,12 +25,11 @@
 
             const signup = await axios.post(`${API}/user`, {
                 username: username.value,
-                email: email.value,
                 passwort: password.value
             });
 
             const login = await axios.post(`${API}/login`, { 
-                email: email.value, 
+                username: username.value, 
                 passwort: password.value 
             }, { withCredentials: true });
 
@@ -53,7 +50,6 @@
 
     <form @submit.prevent="signupSubmit">
         <input type="text" placeholder="Username" v-model="username" required /> <br>
-        <input type="email" placeholder="E-Mail" v-model="email" required /> <br>
         <input type="password" placeholder="Password" v-model="password" required /> <br>
         <input type="password" placeholder="Verify Password" v-model="password_check" /> <br>
         <button type="submit">login</button>
