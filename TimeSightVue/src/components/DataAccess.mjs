@@ -6,11 +6,7 @@ export async function fetchData() {
     try {
         const userStore = useUserStore();
 
-        if (!userStore.user) {
-            throw new Error('User not initialized');
-        }
-
-        const groupsIn = await axios.get(`${API}/user/1/gruppe`);
+        const groupsIn = await axios.get(`${API}/user/${userStore.user.pk_user_id}/gruppe`);
         const groups = groupsIn.data.map(group => group.pk_group_id);
 
         let toDoTermine = [];
@@ -43,7 +39,7 @@ export async function fetchData() {
         return { user: userStore.user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
     } catch (err) {
         console.error(err);
-        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: new Set, dates: [] };
+        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: [] };
     }
 }
 
