@@ -1,8 +1,6 @@
-"use strict";
+import jwt from 'jsonwebtoken';
 
-const jwt = require("jsonwebtoken");
-
-function auth(req, res, next) {
+export default function auth(req, res, next) {
   const cookies = {};
   if(!req.headers.cookie) { 
     return res.status(401).json({ error: "Cookies not yet created."})
@@ -22,5 +20,3 @@ function auth(req, res, next) {
     return res.status(401).json({ error: "Invalid token" });
   }
 }
-
-module.exports = auth;
