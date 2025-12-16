@@ -1,58 +1,72 @@
 <script setup>
-import { ref, onMounted} from "vue";
+import { ref, onMounted, computed } from "vue";
 import { fetchData, formatDate, getTermineByDate } from "./DataAccess.mjs";
+import { useUserStore } from "@/stores/user";
 
 const toDoTermine = ref([]);
 const overTermine = ref([]);
 const doneTermine = ref([]);
-const user = ref({})
 const dates = ref([]);
-const datesIn = ref(new Set())
+const datesIn = ref([])
+const userStore = useUserStore();
 
 const view = ref("todo");
+const list = computed(() => {
+  if (view.value === "todo") return toDoTermine.value;
+  if (view.value === "over") return overTermine.value;
+  if (view.value === "done") return doneTermine.value;
+  return [];
+});
 
-const setView = (v) => {
-  view.value = v
-}
+const sortedDatesIn = computed(() => {
+  const arr = [...datesIn.value];
+  return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
+});
+
+const sortedDates = computed(() => {
+  const arr = [...dates.value];
+  if (view.value === "todo") {
+    return arr.sort((a, b) => a.getTime() - b.getTime());
+  } else {
+    return arr.sort((a, b) => b.getTime() - a.getTime());
+  }
+});
 
 onMounted(async () => {
     const data = await fetchData();
     toDoTermine.value = data.toDoTermine;
     overTermine.value = data.overTermine;
     doneTermine.value = data.doneTermine;
-    user.value = data.user;
     datesIn.value = data.datesIn
     dates.value = data.dates;
 });
-
-console.log(user.value);
 </script>
 
 <template>
     <div id="navbar">
-    <button @click="setView('todo')" 
-        :class="{ active: view === 'todo' }"
-        class="astext"><h2>Ausstehend</h2></button>
-        
-    <button @click="setView('over')" 
-        :class="{ active: view === 'over' }"
-        class="astext"><h2>Zurückliegend</h2></button>
-        
-    <button @click="setView('done')" 
-        :class="{ active: view === 'done' }"
-        class="astext"><h2>Abgeschlossen</h2></button>
+        <button @click="view = 'todo'" :class="{ active: view === 'todo' }" class="astext">
+            <h2>Ausstehend</h2>
+        </button>
+
+        <button @click="view = 'over'" :class="{ active: view === 'over' }" class="astext">
+            <h2>Zurückliegend</h2>
+        </button>
+
+        <button @click="view = 'done'" :class="{ active: view === 'done' }" class="astext">
+            <h2>Abgeschlossen</h2>
+        </button>
     </div>
 
     <dl>
-        <template v-for="(date, index) in dates" :key="index">
-            <dt>
-                <h2>{{ formatDate(date) }}</h2>
-            </dt>
-
-            <template v-for="termin in getTermineByDate(overTermine, datesIn[index])" :key="termin.pk_termin_id">
+        <template v-for="(date, index) in sortedDates" :key="index">
+            <template v-for="(termin, i) in getTermineByDate(list, sortedDatesIn[index])" :key="termin.pk_termin_id">
+                <template v-if="termin && i === 0">
+                    <dt>
+                        <h2>{{ formatDate(date) }}</h2>
+                    </dt>
+                </template>
                 <dd>
                     <h3>{{ termin.bezeichnung }}</h3>
-
                 </dd>
             </template>
         </template>
@@ -96,15 +110,15 @@ ul {
 }
 
 li {
-  float: left;
+    float: left;
 
 }
 
 .astext {
-    background:none;
-    border:none;
-    margin:1rem 1.5rem 1rem 1.5rem;
-    padding:0;
+    background: none;
+    border: none;
+    margin: 1rem 1.5rem 1rem 1.5rem;
+    padding: 0;
     cursor: pointer;
 }
 
