@@ -3,7 +3,7 @@ import cors from "cors";
 import mariadb from "mariadb";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import auth from "./auth.js";
+import auth from "./auth.mjs";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
