@@ -24,6 +24,9 @@ export async function getUserToken() {
 
 export async function fetchData() {
     try {
+        if (user == undefined) {
+            throw new Error();
+        }
         const groupsIn = await axios.get(`${API}/user/1/gruppe`);
         const groups = groupsIn.data.map(group => group.pk_group_id);
 
@@ -54,7 +57,7 @@ export async function fetchData() {
             dates.push(new Date(date))
         }
 
-        return { groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
+        return { user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
     } catch (err) {
         console.error(err);
         return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: new Set ,dates: [] };
