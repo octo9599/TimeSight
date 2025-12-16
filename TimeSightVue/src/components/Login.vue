@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 
 const API = "http://localhost:3000"
-const email = ref("");
+const username = ref("");
 const password = ref("");
 
 const userStore = useUserStore();
@@ -13,7 +13,7 @@ async function loginSubmit() {
   try {
     await axios.post(
       `${API}/login`,
-      { email: email.value, passwort: password.value },
+      { username: username.value, passwort: password.value },
       { withCredentials: true }
     );
     window.location.reload();
@@ -34,7 +34,7 @@ async function loginSubmit() {
       <div class="h2">Melde dich an</div>
     </div>
 
-    <input type="email" placeholder="E-Mail" v-model="email" required />
+    <input type="text" placeholder="Username" v-model="username" required />
     <input type="password" placeholder="Passwort" v-model="password" required />
 
     <button type="button" class="link-forgot" @click="$router.push('/forgot-password')">
