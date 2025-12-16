@@ -5,7 +5,7 @@
 
 <template>
 		<div>
-			<ListView id="test"/>
+			<ListView/>
 		</div>
 </template>
 
