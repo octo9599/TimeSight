@@ -2,7 +2,6 @@ import {createRouter, createWebHistory, type Router} from 'vue-router'
 import ListPage from '@/ListPage.vue';
 import AuthPage from '@/AuthPage.vue';
 import { useUserStore } from '@/stores/user'
-import { getUserStore, getUserToken, user} from '@/components/DataAccess.mjs'
 
 const router: Router = createRouter({
   // would be used if the root of the app is not stored at /
