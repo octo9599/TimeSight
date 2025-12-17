@@ -2,6 +2,7 @@ import {createRouter, createWebHistory, type Router} from 'vue-router'
 import ListPage from '@/ListPage.vue';
 import AuthPage from '@/AuthPage.vue';
 import CalendarView from '@/CalendarView.vue';
+import logoutTest from '@/apiTests/logoutTest.vue';
 import { useUserStore } from '@/stores/user'
 
 const router: Router = createRouter({
@@ -11,7 +12,8 @@ const router: Router = createRouter({
   routes: [
     {path: "/", component: ListPage},
     {path: "/auth", component: AuthPage},
-    {path: "/calendar", component: CalendarView}
+    {path: "/calendar", component: CalendarView},
+    {path: "/logout", component: logoutTest}
   ],
 })
 
