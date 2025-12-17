@@ -174,7 +174,8 @@
 		background: #0b2a3f !important;
 		color: #cbd5e1 !important;
 		border: 3px solid #14364E !important;
-		width: 100px;
+		height: 60px;
+		width: 70px;
 		padding: 6px 14px;
 		font-size: x-large !important;
 		box-shadow: none !important;
