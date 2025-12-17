@@ -29,7 +29,7 @@ const router = useRouter();
 
 #horizontal-container {
 	display: grid;
-	grid-template-columns: 1.1fr 8.9fr;
+	grid-template-columns: 0.9fr 9.1fr;
 	height: 84vh;
 }
 
