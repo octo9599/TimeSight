@@ -4,7 +4,7 @@
 	<div id="topbar-container">
 		<section class="topbar-icon-containers">
 			<a href="/">
-				<img id="eye-icon" alt="TimeSight Logo" class="icons" src="@/assets/images/Logo.png">
+				<img id="eye-icon" alt="TimeSight Logo" class="icons" src="@/assets/images/TISI-Logo.png">
 			</a>
 		</section>
 		<!-- janky but working way to make T and S colored differently
