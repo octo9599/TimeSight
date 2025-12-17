@@ -1,58 +1,59 @@
 import axios from 'axios';
-import { useUserStore } from '@/stores/user.ts';
+import {useUserStore} from '@/stores/user.ts';
+
 const API = "http://localhost:3000";
 
 export async function fetchData() {
-    try {
-        const userStore = useUserStore();
+	try {
+		const userStore = useUserStore();
 
-        const groupsIn = await axios.get(`${API}/user/${userStore.user.pk_user_id}/gruppe`);
-        const groups = groupsIn.data.map(group => group.pk_group_id);
+		const groupsIn = await axios.get(`${API}/user/${userStore.user.pk_user_id}/gruppe`);
+		const groups = groupsIn.data.map(group => group.pk_group_id);
 
-        let toDoTermine = [];
-        let overTermine = [];
-        let doneTermine = [];
+		let toDoTermine = [];
+		let overTermine = [];
+		let doneTermine = [];
 
-        for (const group of groups) {
-            const [toDoIn, overIn, doneIn] = await Promise.all([
-                axios.get(`${API}/gruppe/${group}/termin`),
-                axios.get(`${API}/gruppe/${group}/termin`, { params: { is_past_due: 1 } }),
-                axios.get(`${API}/gruppe/${group}/termin`, { params: { ist_erledigt: 1 } })
-            ]);
+		for (const group of groups) {
+			const [toDoIn, overIn, doneIn] = await Promise.all([
+				axios.get(`${API}/gruppe/${group}/termin`),
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {is_past_due: 1}}),
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {ist_erledigt: 1}})
+			]);
 
-            toDoTermine.push(...toDoIn.data);
-            overTermine.push(...overIn.data);
-            doneTermine.push(...doneIn.data);
-        }
+			toDoTermine.push(...toDoIn.data);
+			overTermine.push(...overIn.data);
+			doneTermine.push(...doneIn.data);
+		}
 
-        let datesIn = new Set();
-        let dates = [];
-        for (const termin of [...toDoTermine, ...overTermine, ...doneTermine]) {
-            datesIn.add(termin.datum);
-        }
-        datesIn = Array.from(datesIn);
-        datesIn.sort();
-        for (const date of datesIn) {
-            dates.push(new Date(date))
-        }
+		let datesIn = new Set();
+		let dates = [];
+		for (const termin of [...toDoTermine, ...overTermine, ...doneTermine]) {
+			datesIn.add(termin.datum);
+		}
+		datesIn = Array.from(datesIn);
+		datesIn.sort();
+		for (const date of datesIn) {
+			dates.push(new Date(date))
+		}
 
-        return { user: userStore.user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates };
-    } catch (err) {
-        console.error(err);
-        return { groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: [] };
-    }
+		return {user: userStore.user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates};
+	} catch (err) {
+		console.error(err);
+		return {groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: []};
+	}
 }
 
 export function formatDate(date) {
-    const weekday = date.toLocaleDateString('de-DE', { weekday: 'short' }).toUpperCase();
-    const day = date.getDate();
-    const month = date.toLocaleDateString('de-DE', { month: 'long' });
-    const year = date.getFullYear();
+	const weekday = date.toLocaleDateString('de-DE', {weekday: 'short'}).toUpperCase();
+	const day = date.getDate();
+	const month = date.toLocaleDateString('de-DE', {month: 'long'});
+	const year = date.getFullYear();
 
-    return `${weekday}, ${day}. ${month} ${year}`;
+	return `${weekday}, ${day}. ${month} ${year}`;
 }
 
 export function getTermineByDate(termine, date) {
-    return termine
-        .filter(t => t.datum.startsWith(date))
+	return termine
+		.filter(t => t.datum.startsWith(date))
 }

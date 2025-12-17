@@ -2,13 +2,13 @@
 
 <template>
 	<div id="sidebar-container">
-		<img src="@/assets/images/Kalender-Dark.png" alt="Group Icon Dark" class="icons" id="calendar-icon">
+		<img id="calendar-icon" alt="Group Icon Dark" class="icons" src="@/assets/images/Kalender-Dark.png">
 		<hr>
-		<img src="@/assets/images/List-Dark.png" alt="Group Icon Dark" class="icons" id="list-icon">
+		<img id="list-icon" alt="Group Icon Dark" class="icons" src="@/assets/images/List-Dark.png">
 		<hr>
-		<img src="@/assets/images/Group-Dark.png" alt="Group Icon Dark" class="icons" id="group-icon">
+		<img id="group-icon" alt="Group Icon Dark" class="icons" src="@/assets/images/Group-Dark.png">
 		<hr>
-		<img src="@/assets/images/+-Dark.png" alt="Group Icon Dark" class="icons" id="add-icon">
+		<img id="add-icon" alt="Group Icon Dark" class="icons" src="@/assets/images/+-Dark.png">
 	</div>
 </template>
 

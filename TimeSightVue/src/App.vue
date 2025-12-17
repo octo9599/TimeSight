@@ -1,21 +1,21 @@
 <script setup>
 import SideBar from "@/components/SideBar.vue";
 import TopBar from "@/components/TopBar.vue";
-import logoutTest from "./apiTests/logoutTest.vue";
-import { useRouter } from "vue-router";
+import {useRouter} from "vue-router";
+
 const router = useRouter();
 </script>
 
 <template>
-	<TopBar />
+	<TopBar/>
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar />
+			<SideBar/>
 		</div>
 		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
 		<!--<p id="test">Hello World this is a paragraph</p>-->
 		<div id="test">
-			<RouterView />
+			<RouterView/>
 		</div>
 	</div>
 </template>

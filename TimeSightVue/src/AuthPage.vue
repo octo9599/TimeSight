@@ -1,22 +1,21 @@
 <script setup>
 
-    import axios from 'axios';
-    import { ref, onMounted } from 'vue';
-    import Login from './components/Login.vue';
-    import Signup from './components/Signup.vue';
+import {ref} from 'vue';
+import Login from './components/Login.vue';
+import Signup from './components/Signup.vue';
 
-    const isLogin = ref(true);
+const isLogin = ref(true);
 
 
 </script>
 
 <template>
 
-    <div>
-        <button @click=" isLogin = !isLogin"> Toggle Login/Signup</button>
-        <Login v-if="isLogin" />
-        <Signup v-else="!isLogin" />
-    </div>
+	<div>
+		<button @click=" isLogin = !isLogin"> Toggle Login/Signup</button>
+		<Login v-if="isLogin"/>
+		<Signup v-else/>
+	</div>
 </template>
 
 <style scoped>

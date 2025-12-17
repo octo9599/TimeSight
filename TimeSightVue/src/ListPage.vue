@@ -1,12 +1,11 @@
 <script setup>
-    import ListView from './components/ListView.vue';
-
+import ListView from './components/ListView.vue';
 </script>
 
 <template>
-		<div>
-			<ListView/>
-		</div>
+	<div>
+		<ListView/>
+	</div>
 </template>
 
 <style scoped>

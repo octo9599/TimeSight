@@ -15,7 +15,7 @@
 			<span class="highlighted">T</span>ime<span class="highlighted">S</span>ight
 		</h1>
 		<!-- actual account icon will go here once available -->
-		<section class="topbar-icon-containers" id="account-icon-container">
+		<section id="account-icon-container" class="topbar-icon-containers">
 			<img id="acc-icon" alt="Account Menu" class="icons" src="@/assets/images/TEMPORARY-Account-Icon.png">
 		</section>
 	</div>
