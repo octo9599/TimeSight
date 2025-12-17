@@ -13,7 +13,8 @@ const router: Router = createRouter({
 		{path: "/", component: ListView},
 		{path: "/auth", component: AuthPage},
 		{path: "/calendar", component: CalendarView},
-		{path: "/logout", component: logoutTest}
+		{path: "/logout", component: logoutTest},
+		{path: "/list", component: ListView},
 	],
 });
 
