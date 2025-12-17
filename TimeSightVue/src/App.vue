@@ -15,7 +15,6 @@ const router = useRouter();
 		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
 		<!--<p id="test">Hello World this is a paragraph</p>-->
 		<div id="test">
-			<logoutTest />
 			<RouterView />
 		</div>
 	</div>

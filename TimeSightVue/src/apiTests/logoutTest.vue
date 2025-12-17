@@ -1,22 +1,20 @@
 <script setup>
 import axios from 'axios'
+import { onMounted } from 'vue';
 
 const API = "http://localhost:3000";
 
-    async function logout() {
-
+    onMounted( async () => {
         try {
             await axios.post(`${API}/logout`);
             window.location.reload();
         } catch(err) {
             console.log(err);
         }
-
-    }
+    });
 </script>
 
 <template>
-  <button @click="logout"> Logout </button>
 </template>
 
 <style scoped>
