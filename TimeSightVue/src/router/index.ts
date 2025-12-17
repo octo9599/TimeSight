@@ -1,21 +1,21 @@
 import {createRouter, createWebHistory, type Router} from 'vue-router'
-import ListPage from '@/ListPage.vue';
+import ListView from '@/ListView.vue';
 import AuthPage from '@/AuthPage.vue';
 import CalendarView from '@/CalendarView.vue';
 import logoutTest from '@/apiTests/logoutTest.vue';
-import {useUserStore} from '@/stores/user'
+import {useUserStore} from '@/stores/user';
 
 const router: Router = createRouter({
 	// would be used if the root of the app is not stored at /
 	// history: createWebHistory(import.meta.env.BASE_URL),
 	history: createWebHistory(),
 	routes: [
-		{path: "/", component: ListPage},
+		{path: "/", component: ListView},
 		{path: "/auth", component: AuthPage},
 		{path: "/calendar", component: CalendarView},
 		{path: "/logout", component: logoutTest}
 	],
-})
+});
 
 router.beforeEach(async (to) => {
 

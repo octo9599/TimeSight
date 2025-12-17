@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onMounted, ref} from "vue";
-import {fetchData, formatDate, getTermineByDate} from "./DataAccess.mjs";
+import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
 import {useUserStore} from "@/stores/user";
 
 const toDoTermine = ref([]);
