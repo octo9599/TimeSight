@@ -34,13 +34,13 @@ export async function fetchData() {
 		datesIn = Array.from(datesIn);
 		datesIn.sort();
 		for (const date of datesIn) {
-			dates.push(new Date(date))
+			dates.push(new Date(date));
 		}
 
-		return {user: userStore.user, groups, toDoTermine, overTermine, doneTermine, datesIn, dates};
+		return {user: userStore.user, groupsIn, groups, toDoTermine, overTermine, doneTermine, datesIn, dates};
 	} catch (err) {
 		console.error(err);
-		return {groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: []};
+		return {groupsIn: [], groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: []};
 	}
 }
 
@@ -54,6 +54,5 @@ export function formatDate(date) {
 }
 
 export function getTermineByDate(termine, date) {
-	return termine
-		.filter(t => t.datum.startsWith(date))
+	return termine.filter(t => t.datum.startsWith(date));
 }
