@@ -10,7 +10,7 @@
 			<img id="list-icon" alt="List Icon" class="icons" src="@/assets/images/List-Dark.png">
 		</router-link>
 		<hr>
-		<router-link to="/group" class="router-links">
+		<router-link to="/groups" class="router-links">
 			<img id="group-icon" alt="Group Icon" class="icons" src="@/assets/images/Group-Dark.png">
 		</router-link>
 		<hr>
