@@ -13,14 +13,21 @@ const userStore = useUserStore();
 
 async function signupSubmit() {
 
-	console.log(username.value)
-	console.log(password.value);
-
 	let user;
 
 	try {
 		if (password.value != password_check.value) {
 			throw Error("password fields don't match.")
+		}
+
+		const user_with_username = await axios.get(`${API}/user`, {
+			params: {
+				username: username.value
+			}
+		});
+
+		if(user_with_username.data.length != 0) {
+			throw Error("username is already taken.");
 		}
 
 		const signup = await axios.post(`${API}/user`, {
