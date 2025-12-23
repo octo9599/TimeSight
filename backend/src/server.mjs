@@ -154,12 +154,26 @@ app.get("/user/:user_id", async (req, res) => {
         const rows = await runQuery("SELECT * FROM User WHERE pk_user_id = ?", [user_id]);
         res.json(rows);
     } catch {
-        res.status(500).json({error: "Failed to fetch users"})
+        res.status(500).json({error: "Failed to fetch user"})
+    }
+});
+
+//Get user through username
+app.get("/user", async (req, res) => {
+    try {
+        const {username} = req.query;
+        if (!username) {
+            return res.status(400).json({error: "username is required for viewing a user"});
+        }
+        const rows = await runQuery("SELECT * FROM User WHERE username = ?", [username]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch user"})
     }
 });
 
 //Login Route which does some crazy chatgpt-recommended security stuff
-// (i wish i had the time to learn this shit fr)
+// (i wish i had the time to actually learn this stuff)
 app.post("/login", async (req, res) => {
     try {
         const {username, passwort} = req.body;
