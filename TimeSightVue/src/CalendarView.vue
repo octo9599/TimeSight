@@ -35,6 +35,10 @@
 		});
 	});
 
+	function closeTermin() {
+		isTerminSelected.value = false;
+	}
+
 	const calendarOptions = {
 		plugins: [dayGridPlugin],
 		initialView: 'dayGridMonth',
@@ -68,7 +72,9 @@
 	<div id="calendar-wrapper">
 		<FullCalendar ref="calendarRef" :options="calendarOptions"/>
 	</div>
-	<TaskView ref="terminViewRef" v-if="isTerminSelected"/>
+	<div>
+		<TaskView @close="closeTermin" ref="terminViewRef" v-if="isTerminSelected"/>
+	</div>
 </template>
 
 <style>
