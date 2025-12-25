@@ -2,7 +2,7 @@
 	import FullCalendar from '@fullcalendar/vue3'
 	import dayGridPlugin from '@fullcalendar/daygrid'
 	import { fetchData, formatDate } from '@/components/DataAccess.mjs'
-	import { ref, onMounted } from 'vue';
+	import { ref, onMounted, nextTick } from 'vue';
 
 	import TaskView from './components/TaskView.vue';
 
@@ -11,15 +11,24 @@
 	let termine;
 	const events = [];
 
+	const isTerminSelected = ref(false);
+	const terminViewRef = ref(null);
+
 	onMounted(async () => {
 		const calendarApi = calendarRef.value.getApi();
 
 		data = await fetchData();
 		termine = [...data.toDoTermine, ...data.overTermine, ...data.doneTermine];
 		termine.forEach(termin => {
+			let bezeichnung = "";
+			if(termin.ist_erledigt === 1) {
+				bezeichnung = termin.bezeichnung + " ✓";
+			} else {
+				bezeichnung = termin.bezeichnung;
+			}
 			calendarApi.addEvent({
 				id: termin.pk_termin_id,
-				title: termin.bezeichnung,
+				title: bezeichnung,
 				start: termin.datum,
 				end: termin.datum
 			});
@@ -45,6 +54,12 @@
 			dayGridMonth: 'M',
 			dayGridWeek: 'W'
 		},
+
+		async eventClick(info) {
+			isTerminSelected.value = true;
+			await nextTick();
+			terminViewRef.value.init_termin(info.event.id);
+		}
 	};
 
 </script>
@@ -53,7 +68,7 @@
 	<div id="calendar-wrapper">
 		<FullCalendar ref="calendarRef" :options="calendarOptions"/>
 	</div>
-	<TaskView termin_id="1"/>
+	<TaskView ref="terminViewRef" v-if="isTerminSelected"/>
 </template>
 
 <style>
