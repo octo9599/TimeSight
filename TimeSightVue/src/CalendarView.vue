@@ -4,6 +4,8 @@
 	import { fetchData, formatDate } from '@/components/DataAccess.mjs'
 	import { ref, onMounted } from 'vue';
 
+	import TaskView from './components/TaskView.vue';
+
 	const calendarRef = ref(null);
 	let data;
 	let termine;
@@ -14,7 +16,6 @@
 
 		data = await fetchData();
 		termine = [...data.toDoTermine, ...data.overTermine, ...data.doneTermine];
-		console.log(termine);
 		termine.forEach(termin => {
 			calendarApi.addEvent({
 				id: termin.pk_termin_id,
@@ -52,6 +53,7 @@
 	<div id="calendar-wrapper">
 		<FullCalendar ref="calendarRef" :options="calendarOptions"/>
 	</div>
+	<TaskView termin_id="1"/>
 </template>
 
 <style>
