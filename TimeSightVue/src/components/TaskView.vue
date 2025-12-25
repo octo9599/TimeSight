@@ -1,8 +1,8 @@
 <script setup>
     import axios from 'axios';
-import { onMounted, ref } from 'vue';
+    import { onMounted, ref } from 'vue';
 
-    const props = defineProps(['termin_id']);
+    const id = ref(0);
     const bezeichnung = ref("");
     const beschreibung = ref("");
     const datum = ref("");
@@ -13,18 +13,23 @@ import { onMounted, ref } from 'vue';
 
     const API = "http://localhost:3000";
     let termin;
-    async function init_termin() {
+    async function init_termin(termin_id) {
         try {
-            termin = (await axios.get(`${API}/termin/${props.termin_id}`)).data[0];
+            id.value = termin_id;
+
+            if(id.value == 0) {
+                throw new Error("termin_id is undefined");
+            }
+
+            termin = (await axios.get(`${API}/termin/${id.value}`)).data[0];
+
             bezeichnung.value = termin.bezeichnung;
             beschreibung.value = termin.beschreibung;
             datum.value = termin.datum;
-
             gruppenname.value = (await axios.get(`${API}/gruppe/${termin.fk_group_id}`)).data[0].gruppenname;
             erstellername.value = (await axios.get(`${API}/user/${termin.fk_ersteller_id}`)).data[0].username;
 
             is_checked.value = termin.ist_erledigt === 1;
-            console.log(is_checked.value);
 
         } catch(err) {
             console.log(err);
@@ -34,7 +39,7 @@ import { onMounted, ref } from 'vue';
     async function change_erledigt() {
 
         try {
-            console.log((await axios.patch(`${API}/termin/${props.termin_id}`, {
+            console.log((await axios.patch(`${API}/termin/${id.value}`, {
                 ist_erledigt: is_checked.value
             })).data);
 
@@ -44,10 +49,11 @@ import { onMounted, ref } from 'vue';
 
     }
 
+    defineExpose({init_termin});
+
 </script>
 
 <template>
-    <button @click="init_termin">init termin</button>
     <div>
         {{ bezeichnung }} <br>
         <input type="checkbox" v-model="is_checked" @change="change_erledigt"/> <br>
