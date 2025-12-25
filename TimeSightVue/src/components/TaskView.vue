@@ -11,6 +11,10 @@
 
     const is_checked = ref(false);
 
+    let is_changed = false;
+
+    const emit = defineEmits(['close']);
+
     const API = "http://localhost:3000";
     let termin;
     async function init_termin(termin_id) {
@@ -39,6 +43,7 @@
     async function change_erledigt() {
 
         try {
+            is_changed = true;
             console.log((await axios.patch(`${API}/termin/${id.value}`, {
                 ist_erledigt: is_checked.value
             })).data);
@@ -47,6 +52,10 @@
             console.log(err);
         }
 
+    }
+
+    function closeTermin() {
+        emit('close', is_changed);
     }
 
     defineExpose({init_termin});
@@ -60,12 +69,14 @@
         {{ beschreibung }} <br>
         {{ datum }} <br>
         {{ gruppenname }} <br>
-        {{ erstellername }}
+        {{ erstellername }} <br>
+        <button @click="closeTermin" >X</button>
     </div>
 </template>
 
 <style scoped>
     div {
-        color: black;
+        background-color: var(--main-dark);
+        color: var(--text-dark);
     }
 </style>
