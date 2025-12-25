@@ -6,6 +6,9 @@ import Signup from './components/Signup.vue';
 
 const isLogin = ref(true);
 
+function switchAuth() {
+  isLogin.value = !isLogin.value;
+}
 
 </script>
 
@@ -15,6 +18,10 @@ const isLogin = ref(true);
 		<button @click=" isLogin = !isLogin"> Toggle Login/Signup</button>
 		<Login v-if="isLogin"/>
 		<Signup v-else/>
+
+		<Login v-if="isLogin" @switch="switchAuth" />
+    	<Signup v-else @switch="switchAuth" />
+		
 	</div>
 </template>
 

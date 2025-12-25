@@ -1,7 +1,7 @@
 <script setup>
 import axios from 'axios';
-import {ref} from 'vue';
-import {useUserStore} from '@/stores/user';
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
 
 const API = "http://localhost:3000";
 
@@ -10,59 +10,197 @@ const password = ref("");
 const password_check = ref("");
 
 const userStore = useUserStore();
+const emit = defineEmits(['switch']);
 
-async function signupSubmit() {
-
-	let user;
-
-	try {
-		if (password.value != password_check.value) {
-			throw Error("password fields don't match.")
-		}
-
-		const user_with_username = await axios.get(`${API}/user`, {
-			params: {
-				username: username.value
-			}
-		});
-
-		if(user_with_username.data.length != 0) {
-			throw Error("username is already taken.");
-		}
-
-		const signup = await axios.post(`${API}/user`, {
-			username: username.value,
-			passwort: password.value
-		});
-
-		const login = await axios.post(`${API}/login`, {
-			username: username.value,
-			passwort: password.value
-		}, {withCredentials: true});
-
-		window.location.reload();
-
-	} catch (err) {
-		console.log(err);
-	}
-
+function notifyParent() {
+  emit('switch');
 }
 
+async function signupSubmit() {
+  try {
+    if (password.value != password_check.value) {
+      throw Error("password fields don't match.")
+    }
+
+    await axios.post(`${API}/user`, {
+      username: username.value,
+      passwort: password.value
+    });
+
+    await axios.post(`${API}/login`, {
+      username: username.value,
+      passwort: password.value
+    }, { withCredentials: true });
+
+    window.location.reload();
+  } catch (err) {
+    console.log(err);
+  }
+}
 </script>
 
 <template>
-	<p>
-		Signup
-	</p>
+  <form @submit.prevent="signupSubmit" class="auth-card">
+    <div class="brand-row">
+      <div class="brand-logo">TimeSight</div>
+    </div>
 
-	<form @submit.prevent="signupSubmit">
-		<input v-model="username" placeholder="Username" required type="text"/> <br>
-		<input v-model="password" placeholder="Password" required type="password"/> <br>
-		<input v-model="password_check" placeholder="Verify Password" type="password"/> <br>
-		<button type="submit">login</button>
-	</form>
+    <div class="headline">
+      <div class="h1">Account erstellen</div>
+      <div class="h2">Registriere dich</div>
+    </div>
+
+    <input type="text" placeholder="Username" v-model="username" required />
+    <input type="password" placeholder="Passwort" v-model="password" required />
+    <input type="password" placeholder="Passwort bestätigen" v-model="password_check" required />
+
+    <button type="submit" class="btn-primary">Signup</button>
+
+    <div class="divider"></div>
+
+    <div class="auth-switch">
+      <span>Du hast schon ein Konto?</span>
+      <button type="button" class="link-btn" @click="notifyParent">
+        Jetzt anmelden
+      </button>
+    </div>
+  </form>
 </template>
 
 <style scoped>
+br{ display:none; }
 
+/* Card zentriert */
+.auth-card{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(520px, 92vw);
+  padding: 26px;
+
+  background: var(--main-dark);
+  border: 6px solid var(--field-dark);
+  border-radius: 8px;
+
+  font-family: "Goodland", system-ui, sans-serif;
+  color: var(--text-dark);
+}
+
+/* Brand */
+.brand-row{
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.brand-logo{
+  font-weight: 800;
+  letter-spacing: .6px;
+  font-size: 18px;
+  color: var(--text-dark);
+}
+
+/* Headline */
+.headline{
+  text-align: left;
+  margin-bottom: 14px;
+}
+
+.h1{
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.h2{
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: .9;
+}
+
+/* Inputs */
+input{
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin-top: 12px;
+  padding: 0 14px;
+
+  font-family: "Goodland", system-ui, sans-serif;
+  font-size: 14px;
+
+  color: var(--text-dark);
+  background: var(--field-dark);
+  border: 2px solid var(--text-dark);
+  border-radius: 6px;
+  outline: none;
+}
+
+input::placeholder{
+  color: rgba(219, 241, 255, 0.65);
+}
+
+input:focus{
+  border-color: var(--accent-dark);
+}
+
+/* Primary Button */
+.btn-primary{
+  margin-top: 16px;
+  width: 100%;
+  height: 42px;
+
+  font-family: "Goodland", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+
+  color: var(--text-dark);
+  background: var(--today-dark);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary:hover{ filter: brightness(1.05); }
+.btn-primary:active{ filter: brightness(0.97); }
+
+/* Divider */
+.divider{
+  margin: 18px 0 14px 0;
+  height: 2px;
+  background: rgba(219, 241, 255, 0.18);
+}
+
+/* "Schon ein Konto?" Row */
+.auth-switch{
+  text-align: center;
+  font-family: "Goodland", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--text-dark);
+}
+
+.link-btn{
+  margin-left: 6px;
+  padding: 0;
+
+  background: none;
+  border: none;
+
+  font-family: "Goodland", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.link-btn:hover{
+  text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 420px){
+  .auth-card{ padding: 20px; }
+}
 </style>
