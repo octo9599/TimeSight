@@ -20,9 +20,15 @@
 		data = await fetchData();
 		termine = [...data.toDoTermine, ...data.overTermine, ...data.doneTermine];
 		termine.forEach(termin => {
+			let bezeichnung = "";
+			if(termin.ist_erledigt === 1) {
+				bezeichnung = termin.bezeichnung + " ✓";
+			} else {
+				bezeichnung = termin.bezeichnung;
+			}
 			calendarApi.addEvent({
 				id: termin.pk_termin_id,
-				title: termin.bezeichnung,
+				title: bezeichnung,
 				start: termin.datum,
 				end: termin.datum
 			});
