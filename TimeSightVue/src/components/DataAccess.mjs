@@ -13,17 +13,20 @@ export async function fetchData() {
 		let toDoTermine = [];
 		let overTermine = [];
 		let doneTermine = [];
+		let groupUsers = {};
 
 		for (const group of groups) {
-			const [toDoIn, overIn, doneIn] = await Promise.all([
+			const [toDoIn, overIn, doneIn, usersIn] = await Promise.all([
 				axios.get(`${API}/gruppe/${group}/termin`),
 				axios.get(`${API}/gruppe/${group}/termin`, {params: {is_past_due: 1}}),
-				axios.get(`${API}/gruppe/${group}/termin`, {params: {ist_erledigt: 1}})
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {ist_erledigt: 1}}),
+				axios.get(`${API}/gruppe/${group}/user`)
 			]);
 
 			toDoTermine.push(...toDoIn.data);
 			overTermine.push(...overIn.data);
 			doneTermine.push(...doneIn.data);
+			groupUsers[group] = (usersIn.data);
 		}
 
 		let datesIn = new Set();
@@ -37,10 +40,10 @@ export async function fetchData() {
 			dates.push(new Date(date));
 		}
 
-		return {user: userStore.user, groupsIn, groups, toDoTermine, overTermine, doneTermine, datesIn, dates};
+		return {user: userStore.user, groupsIn, groups, groupUsers, toDoTermine, overTermine, doneTermine, datesIn, dates};
 	} catch (err) {
 		console.error(err);
-		return {groupsIn: [], groups: [], toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: []};
+		return {groupsIn: [], groups: [], groupUsers: {}, toDoTermine: [], overTermine: [], doneTermine: [], datesIn: [], dates: []};
 	}
 }
 
