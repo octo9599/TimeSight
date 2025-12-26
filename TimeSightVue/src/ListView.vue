@@ -1,45 +1,82 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
-import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
-import {useUserStore} from "@/stores/user";
+	import {computed, onMounted, ref, nextTick } from "vue";
+	import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
+	import {useUserStore} from "@/stores/user";
+	import axios from 'axios';
+import TaskView from "./components/TaskView.vue";
 
-const toDoTermine = ref([]);
-const overTermine = ref([]);
-const doneTermine = ref([]);
-const dates = ref([]);
-const datesIn = ref([])
-const userStore = useUserStore();
+	const API = "http://localhost:3000"
 
-const view = ref("todo");
-const list = computed(() => {
-	if (view.value === "todo") return toDoTermine.value;
-	if (view.value === "over") return overTermine.value;
-	if (view.value === "done") return doneTermine.value;
-	return [];
-});
+	const toDoTermine = ref([]);
+	const overTermine = ref([]);
+	const doneTermine = ref([]);
+	const dates = ref([]);
+	const datesIn = ref([])
+	const userStore = useUserStore();
 
-const sortedDatesIn = computed(() => {
-	const arr = [...datesIn.value];
-	return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
-});
+	const isTerminSelected = ref(false);
+	const terminViewRef = ref(null);
 
-const sortedDates = computed(() => {
-	const arr = [...dates.value];
-	if (view.value === "todo") {
-		return arr.sort((a, b) => a.getTime() - b.getTime());
-	} else {
-		return arr.sort((a, b) => b.getTime() - a.getTime());
+	const view = ref("todo");
+	const list = computed(() => {
+		if (view.value === "todo") return toDoTermine.value;
+		if (view.value === "over") return overTermine.value;
+		if (view.value === "done") return doneTermine.value;
+		return [];
+	});
+
+	const sortedDatesIn = computed(() => {
+		const arr = [...datesIn.value];
+		return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
+	});
+
+	const sortedDates = computed(() => {
+		const arr = [...dates.value];
+		if (view.value === "todo") {
+			return arr.sort((a, b) => a.getTime() - b.getTime());
+		} else {
+			return arr.sort((a, b) => b.getTime() - a.getTime());
+		}
+	});
+
+	async function viewTermin(id) {
+		isTerminSelected.value = true;
+		await nextTick();
+		terminViewRef.value.init_termin(id);
 	}
-});
 
-onMounted(async () => {
-	const data = await fetchData();
-	toDoTermine.value = data.toDoTermine;
-	overTermine.value = data.overTermine;
-	doneTermine.value = data.doneTermine;
-	datesIn.value = data.datesIn
-	dates.value = data.dates;
-});
+	async function change_erledigt(event, id) {
+
+		try {
+			console.log((await axios.patch(`${API}/termin/${id}`, {
+				ist_erledigt: event.target.checked
+			})).data);
+
+			
+
+		} catch (err) {
+			console.log(err);
+		}
+
+		window.location.reload();
+
+	}
+
+	function closeTermin(is_changed) {
+		if(is_changed) {
+			window.location.reload();
+		}
+		isTerminSelected.value = false;
+	}
+
+	onMounted(async () => {
+		const data = await fetchData();
+		toDoTermine.value = data.toDoTermine;
+		overTermine.value = data.overTermine;
+		doneTermine.value = data.doneTermine;
+		datesIn.value = data.datesIn
+		dates.value = data.dates;
+	});
 </script>
 
 <template>
@@ -66,11 +103,16 @@ onMounted(async () => {
 					</dt>
 				</template>
 				<dd>
-					<h3>{{ termin.bezeichnung }}</h3>
+					<a href="#" class="termin" @click.prevent="viewTermin(termin.pk_termin_id)"><h3>{{ termin.bezeichnung }}</h3></a>
+					<input type="checkbox" :checked="termin.ist_erledigt === 1" @change="change_erledigt($event, termin.pk_termin_id)"/>
 				</dd>
 			</template>
 		</template>
 	</dl>
+
+	<div>
+		<TaskView @close="closeTermin" ref="terminViewRef" v-if="isTerminSelected"/>
+	</div>
 </template>
 
 <style scoped>
@@ -93,7 +135,7 @@ dt {
 	margin-left: 1%;
 }
 
-dd {
+dd, button {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -126,6 +168,10 @@ li {
 	text-decoration: underline;
 	text-decoration-color: var(--accent-dark);
 	text-decoration-thickness: 2px;
+}
+
+.termin {
+	text-decoration: none;
 }
 
 #navbar {
