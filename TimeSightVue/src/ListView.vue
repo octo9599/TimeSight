@@ -1,17 +1,17 @@
 <script setup>
-	import {computed, onMounted, ref, nextTick } from "vue";
+	import {computed, onMounted, ref, nextTick} from "vue";
 	import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
 	import {useUserStore} from "@/stores/user";
 	import axios from 'axios';
-import TaskView from "./components/TaskView.vue";
+	import TaskView from "./components/TaskView.vue";
 
-	const API = "http://localhost:3000"
+	const API = "http://localhost:3000";
 
 	const toDoTermine = ref([]);
 	const overTermine = ref([]);
 	const doneTermine = ref([]);
 	const dates = ref([]);
-	const datesIn = ref([])
+	const datesIn = ref([]);
 	const userStore = useUserStore();
 
 	const isTerminSelected = ref(false);
@@ -52,8 +52,6 @@ import TaskView from "./components/TaskView.vue";
 				ist_erledigt: event.target.checked
 			})).data);
 
-			
-
 		} catch (err) {
 			console.log(err);
 		}
@@ -74,7 +72,7 @@ import TaskView from "./components/TaskView.vue";
 		toDoTermine.value = data.toDoTermine;
 		overTermine.value = data.overTermine;
 		doneTermine.value = data.doneTermine;
-		datesIn.value = data.datesIn
+		datesIn.value = data.datesIn;
 		dates.value = data.dates;
 	});
 </script>
