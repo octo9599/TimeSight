@@ -112,8 +112,12 @@
 		</template>
 	</dl>
 
-	<div>
-		<TaskView @close="closeTermin" ref="terminViewRef" v-if="isTerminSelected"/>
+	<div v-if="isTerminSelected" class="modal-overlay" @click.self="closeTermin(false)">
+		<TaskView
+			ref="terminViewRef"
+			class="modal-window"
+			@close="closeTermin"
+		/>
 	</div>
 </template>
 
@@ -182,4 +186,35 @@ li {
 	align-items: center;
 	width: 35%;
 }
+
+
+/* TaskView Window */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+}
+
+.modal-window {
+  background: var(--main-dark);
+  border-radius: 12px;
+  width: min(600px, 90vw);
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  animation: modalIn 0.2s ease-out;
+}
+
 </style>
