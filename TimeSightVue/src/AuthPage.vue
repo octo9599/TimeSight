@@ -15,7 +15,6 @@ function switchAuth() {
 <template>
 
 	<div>
-		<button @click=" isLogin = !isLogin"> Toggle Login/Signup</button>
 		<Login v-if="isLogin"/>
 		<Signup v-else/>
 
