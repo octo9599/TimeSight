@@ -7,6 +7,8 @@ const API = "http://localhost:3000"
 const username = ref("");
 const password = ref("");
 
+const failed = ref("");
+
 const userStore = useUserStore();
 const emit = defineEmits(['switch']);
 
@@ -22,7 +24,11 @@ async function loginSubmit() {
     );
     window.location.reload();
   } catch (err) {
-    console.log(err);
+    if(err.status == 401) {
+      failed.value = "Falsches Passwort oder nicht existierender User."
+    } else {
+      failed.value = `Error Code ${err.status}: Something went wrong during login process.`;
+    }
   }
 }
 </script>
@@ -45,6 +51,8 @@ async function loginSubmit() {
       Passwort vergessen
     </button>
 
+    <div id="error">{{ failed }}</div>
+
     <button type="submit" class="btn-primary">Login</button>
 
     <div class="divider"></div>
@@ -59,6 +67,11 @@ async function loginSubmit() {
 </template>
 
 <style scoped>
+
+#error {
+  color:crimson;
+}
+
 /* Card zentriert */
 .auth-card{
   position: fixed;
