@@ -63,20 +63,82 @@
 </script>
 
 <template>
-    <div>
-        {{ bezeichnung }} <br>
-        <input type="checkbox" v-model="is_checked" @change="change_erledigt"/> <br>
-        {{ beschreibung }} <br>
-        {{ datum }} <br>
-        {{ gruppenname }} <br>
-        {{ erstellername }} <br>
-        <button @click="closeTermin" >X</button>
+<div class="taskview">
+    <button class="close-btn" @click="closeTermin">x</button>
+    <div class="header">
+        <h2>-- {{ bezeichnung }} --</h2>
+        <div class="desc-row">
+            <span id="desc">{{ beschreibung }}</span>
+            <cdesc>Erledigt: </cdesc><input id="done" type="checkbox" v-model="is_checked" @change="change_erledigt" />
+        </div>
     </div>
+    <div class="content">
+        <p><cdesc>Am: </cdesc> {{ datum }}</p>
+        <p><cdesc>Gruppe: </cdesc> {{ gruppenname }}</p>
+        <p><cdesc>Ersteller: </cdesc> {{ erstellername }}</p>
+    </div>
+</div>
 </template>
 
+
+
 <style scoped>
-    div {
-        background-color: var(--main-dark);
-        color: var(--text-dark);
+    .taskview {
+        position: relative;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
     }
+
+    .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding-left: 1.5%;
+        padding-right:1.5%;
+        font-size: 1.2rem;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-right: 2.5rem;
+        margin-bottom: 0;
+    }
+
+    .desc-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+    }
+
+    .content {
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .content p {
+        margin: 0.25rem 0;
+    }
+
+    #desc {
+        margin: 0;
+        line-height: 1.2;
+        color: var(--field-light);
+        flex: 1;
+    }
+
+    cdesc {
+        color: var(--field-light);
+    }
+
+    h2 {
+        margin: 0;
+        line-height: 1.2;
+    }
+
+
 </style>
