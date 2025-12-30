@@ -56,15 +56,24 @@
 			console.log(err);
 		}
 
-		window.location.reload();
+		reloadTermine();
 
 	}
 
 	function closeTermin(is_changed) {
 		if(is_changed) {
-			window.location.reload();
+			reloadTermine();
 		}
 		isTerminSelected.value = false;
+	}
+
+	async function reloadTermine() {
+		const data = await fetchData();
+		toDoTermine.value = data.toDoTermine;
+		overTermine.value = data.overTermine;
+		doneTermine.value = data.doneTermine;
+		datesIn.value = data.datesIn;
+		dates.value = data.dates;
 	}
 
 	onMounted(async () => {
