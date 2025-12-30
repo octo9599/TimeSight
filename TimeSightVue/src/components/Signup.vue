@@ -9,6 +9,8 @@ const username = ref("");
 const password = ref("");
 const password_check = ref("");
 
+const failed = ref("");
+
 const userStore = useUserStore();
 const emit = defineEmits(['switch']);
 
@@ -19,7 +21,12 @@ function notifyParent() {
 async function signupSubmit() {
   try {
     if (password.value != password_check.value) {
-      throw Error("password fields don't match.")
+      throw Error("Passwort-Felder stimmen nicht überein.")
+    }
+
+    const existing_user = (await axios.get(`${API}/user`, {params: {username: username.value}})).data;
+    if(existing_user[0]) {
+      throw Error("Username ist bereits vergeben.");
     }
 
     await axios.post(`${API}/user`, {
@@ -34,7 +41,12 @@ async function signupSubmit() {
 
     window.location.reload();
   } catch (err) {
-    console.log(err);
+    print(err);
+    if(err.status) {
+      failed.value = `Error Code ${err.status}: Something went wrong during signup process.`;
+    } else {
+      failed.value = err.message;
+    }
   }
 }
 </script>
@@ -56,6 +68,8 @@ async function signupSubmit() {
 
     <button type="submit" class="btn-primary">Signup</button>
 
+    <div id="error">{{ failed }}</div>
+
     <div class="divider"></div>
 
     <div class="auth-switch">
@@ -68,6 +82,11 @@ async function signupSubmit() {
 </template>
 
 <style scoped>
+
+#error {
+  color:crimson;
+}
+
 br{ display:none; }
 
 /* Card zentriert */
