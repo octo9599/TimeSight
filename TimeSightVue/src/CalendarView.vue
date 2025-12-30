@@ -72,7 +72,7 @@
 	<div id="calendar-wrapper">
 		<FullCalendar ref="calendarRef" :options="calendarOptions"/>
 	</div>
-		<div v-if="isTerminSelected" class="modal-overlay" @click.self="closeTermin(false)">
+		<div v-if="isTerminSelected" class="modal-overlay" @click.self="closeTermin(true)">
 		<TaskView
 			ref="terminViewRef"
 			class="modal-window"
