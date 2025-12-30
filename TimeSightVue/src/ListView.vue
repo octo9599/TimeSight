@@ -56,18 +56,18 @@
 			console.log(err);
 		}
 
-		reloadTermine();
+		loadTermine();
 
 	}
 
 	function closeTermin(is_changed) {
 		if(is_changed) {
-			reloadTermine();
+			loadTermine();
 		}
 		isTerminSelected.value = false;
 	}
 
-	async function reloadTermine() {
+	async function loadTermine() {
 		const data = await fetchData();
 		toDoTermine.value = data.toDoTermine;
 		overTermine.value = data.overTermine;
@@ -77,12 +77,7 @@
 	}
 
 	onMounted(async () => {
-		const data = await fetchData();
-		toDoTermine.value = data.toDoTermine;
-		overTermine.value = data.overTermine;
-		doneTermine.value = data.doneTermine;
-		datesIn.value = data.datesIn;
-		dates.value = data.dates;
+		loadTermine();
 	});
 </script>
 
