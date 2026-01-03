@@ -87,7 +87,8 @@ h1, h2, h3 {
 .no-members,
 .no-groups {
     color: var(--text-dark);
-    font-style: italic;
+    text-align: center;
+    font-size: 1.5rem;
 }
 
 h2 {
