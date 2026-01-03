@@ -1,21 +1,32 @@
 <script setup>
-import SideBar from "@/components/SideBar.vue";
-import TopBar from "@/components/TopBar.vue";
-import {useRouter} from "vue-router";
+	import SideBar from "@/components/SideBar.vue";
+	import TopBar from "@/components/TopBar.vue";
+	import AddTask from "./components/AddTask.vue";
+	import {useRouter} from "vue-router";
+	import { ref } from "vue";
 
-const router = useRouter();
+	const router = useRouter();
+	const isAddVisible = ref(false);
+
+	function changeVisibleAdd() {
+		isAddVisible.value = !isAddVisible.value;
+	}
+
 </script>
 
 <template>
 	<TopBar/>
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar/>
+			<SideBar @addTask="changeVisibleAdd"/>
 		</div>
 		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
 		<!--<p id="test">Hello World this is a paragraph</p>-->
 		<div id="test">
-			<RouterView/>
+				<RouterView/>
+			<div v-if="isAddVisible" class="modal-overlay" @click.self="changeVisibleAdd">
+				<AddTask class="modal-window"/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -43,4 +54,34 @@ const router = useRouter();
 	color: var(--text-dark);
 	margin: 0;
 }
+
+/* AddTask Window */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+}
+
+.modal-window {
+  background: var(--main-dark);
+  border-radius: 12px;
+  width: min(600px, 90vw);
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+  animation: modalIn 0.2s ease-out;
+}
+
 </style>
