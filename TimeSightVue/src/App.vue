@@ -2,14 +2,19 @@
 	import SideBar from "@/components/SideBar.vue";
 	import TopBar from "@/components/TopBar.vue";
 	import AddTask from "./components/AddTask.vue";
+	import {useLoadTaskStore} from '@/stores/loadTask.ts';
 	import {useRouter} from "vue-router";
 	import { ref } from "vue";
 
 	const router = useRouter();
+	const loadTaskStore = useLoadTaskStore();
 	const isAddVisible = ref(false);
 
 	function changeVisibleAdd() {
 		isAddVisible.value = !isAddVisible.value;
+		if(!isAddVisible.value) {
+			loadTaskStore.shouldLoad = true;
+		}
 	}
 
 </script>
@@ -25,7 +30,7 @@
 		<div id="test">
 				<RouterView/>
 			<div v-if="isAddVisible" class="modal-overlay" @click.self="changeVisibleAdd">
-				<AddTask class="modal-window"/>
+				<AddTask @close="changeVisibleAdd" class="modal-window"/>
 			</div>
 		</div>
 	</div>
