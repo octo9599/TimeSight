@@ -3,6 +3,8 @@
     import { fetchData } from './DataAccess.mjs';
     import axios from 'axios';
 
+    const emit = defineEmits(['close']);
+
     const API = "http://localhost:3000";
 
     let data = null;
@@ -32,6 +34,8 @@
             group_id: groupSelect.value,
             user_id: data.user.pk_user_id
         });
+
+        emit('close');
 
     }
 </script>
