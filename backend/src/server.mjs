@@ -285,8 +285,12 @@ app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
 app.post("/termin", async (req, res) => {
     const {bezeichnung, beschreibung, datum, uhrzeit, group_id, user_id} = req.body;
 
-    if (!bezeichnung || !beschreibung || !datum || !uhrzeit || !group_id || !user_id) {
-        return res.status(400).json({error: "bezeichnung, beschreibung, datum, uhrzeit, group_id and user_id are required to create a task."});
+    if (!bezeichnung || !datum || !uhrzeit || !group_id || !user_id) {
+        return res.status(400).json({error: "bezeichnung, datum, uhrzeit, group_id and user_id are required to create a task."});
+    }
+
+    if(!beschreibung) {
+        beschreibung = "";
     }
 
     try {
