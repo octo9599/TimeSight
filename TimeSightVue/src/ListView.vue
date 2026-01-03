@@ -1,7 +1,8 @@
 <script setup>
-	import {computed, onMounted, ref, nextTick} from "vue";
+	import {computed, onMounted, ref, nextTick, watch } from "vue";
 	import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
 	import {useUserStore} from "@/stores/user";
+	import {useLoadTaskStore} from '@/stores/loadTask.ts';
 	import axios from 'axios';
 	import TaskView from "./components/TaskView.vue";
 
@@ -12,7 +13,9 @@
 	const doneTermine = ref([]);
 	const dates = ref([]);
 	const datesIn = ref([]);
+
 	const userStore = useUserStore();
+	const loadTaskStore = useLoadTaskStore();
 
 	const isTerminSelected = ref(false);
 	const terminViewRef = ref(null);
@@ -75,6 +78,18 @@
 		datesIn.value = data.datesIn;
 		dates.value = data.dates;
 	}
+
+
+	watch(
+		() => loadTaskStore.shouldLoad,
+		(newVal) => {
+			if (newVal === true) {
+				loadTermine();
+				loadTaskStore.shouldLoad = false
+			}
+		},
+		{ immediate: true }
+	);
 
 	onMounted(async () => {
 		loadTermine();

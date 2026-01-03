@@ -2,9 +2,12 @@
 	import FullCalendar from '@fullcalendar/vue3'
 	import dayGridPlugin from '@fullcalendar/daygrid'
 	import { fetchData, formatDate } from '@/components/DataAccess.mjs'
-	import { ref, onMounted, nextTick } from 'vue';
+	import {useLoadTaskStore} from '@/stores/loadTask.ts';
+	import { ref, onMounted, nextTick, watch } from 'vue';
 
 	import TaskView from './components/TaskView.vue';
+
+	const loadTaskStore = useLoadTaskStore();
 
 	const calendarRef = ref(null);
 	let data;
@@ -50,6 +53,17 @@
 			loadTermine();
 		}
 	}
+
+	watch(
+		() => loadTaskStore.shouldLoad,
+		(newVal) => {
+			if (newVal === true) {
+				loadTermine();
+				loadTaskStore.shouldLoad = false
+			}
+		},
+		{ immediate: true }
+	);
 
 	const calendarOptions = {
 		plugins: [dayGridPlugin],
