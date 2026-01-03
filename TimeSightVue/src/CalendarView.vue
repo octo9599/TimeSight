@@ -15,8 +15,13 @@
 	const terminViewRef = ref(null);
 
 	onMounted(async () => {
+		loadTermine();
+	});
+
+	async function loadTermine() {
 		const calendarApi = calendarRef.value.getApi();
 
+		calendarApi.removeAllEvents();
 		data = await fetchData();
 		termine = [...data.toDoTermine, ...data.overTermine, ...data.doneTermine];
 		termine.forEach(termin => {
@@ -37,10 +42,13 @@
 				end: endtime
 			});
 		});
-	});
+	}
 
-	function closeTermin() {
+	function closeTermin(is_changed) {
 		isTerminSelected.value = false;
+		if(is_changed) {
+			loadTermine();
+		}
 	}
 
 	const calendarOptions = {
