@@ -1,4 +1,12 @@
-<script setup></script>
+<script setup>
+
+	const emits = defineEmits(['addTask']);
+
+	function notifyParent() {
+		emits('addTask');
+	}
+
+</script>
 
 <template>
 	<div id="sidebar-container">
@@ -14,9 +22,9 @@
 			<img id="group-icon" alt="Group Icon" class="icons" src="@/assets/images/Group-Dark.png">
 		</router-link>
 		<hr>
-		<router-link to="" class="router-links"> <!-- add + page -->
+		<button @click="notifyParent" id="addBtn" class="router-links"> <!-- add + page -->
 			<img id="add-icon" alt="Add Icon" class="icons" src="@/assets/images/+-Dark.png">
-		</router-link>
+		</button>
 	</div>
 </template>
 
@@ -53,5 +61,10 @@ hr {
 
 #sidebar-container {
 	margin: 0;
+}
+
+#addBtn {
+	background-color: var(--main-dark);
+	border: none;
 }
 </style>
