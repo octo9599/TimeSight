@@ -20,6 +20,10 @@
 		data = await fetchData();
 		termine = [...data.toDoTermine, ...data.overTermine, ...data.doneTermine];
 		termine.forEach(termin => {
+			let endtime = termin.datum;
+			if(endtime.substring(endtime.indexOf(' ')+1, endtime.length-3) == '23:59') {
+				endtime = termin.datum.substring(0, termin.datum.indexOf(' ')) + " 24:00:00";
+			}
 			let bezeichnung = "";
 			if(termin.ist_erledigt === 1) {
 				bezeichnung = termin.bezeichnung + " ✓";
@@ -30,7 +34,7 @@
 				id: termin.pk_termin_id,
 				title: bezeichnung,
 				start: termin.datum,
-				end: termin.datum
+				end: endtime
 			});
 		});
 	});
