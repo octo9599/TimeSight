@@ -1,5 +1,16 @@
-<script>
+<script setup>
+    import { ref, onMounted } from "vue";
+    import { fetchData } from "./DataAccess.mjs"
+    import { useUserStore } from "@/stores/user"
 
+    const username = ref("");
+
+    onMounted (async () => {
+        const data = await fetchData();
+        username.value = data.user.username;
+
+    });
+    
 </script>
 <template>
     <div id="field">
@@ -9,12 +20,12 @@
             </th>
             <tr>
                 <td>Name</td>
-                <td>.</td>
+                <td>{{ username }}</td>
                 <td><button class="change-button">ändern</button></td>
             </tr>
             <tr>
                 <td>Passwort</td>
-                <td>.</td>
+                <td>••••••••••••••</td>
                 <td><button class="change-button">ändern</button></td>
             </tr>
         </table>
@@ -27,7 +38,7 @@
 #field {
     background-color: var(--field-dark);
     border: 5px solid var(--field-dark);
-    border-radius: 8px;
+    border-radius: 10px;
     margin: 2rem 10rem 2rem 10rem;
 }
 
