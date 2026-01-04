@@ -10,6 +10,7 @@ const failed = ref("");
 const changeName = ref(false);
 const changePass = ref(false);
 
+const password = ref("");
 const username = ref("");
 const user_id = ref();
 
@@ -36,6 +37,17 @@ async function submitName() {
         changeName.value = false;
         await axios.patch(`${API}/user/${user_id.value}`, {
             username: username.value
+        });
+        window.location.reload();
+    } catch (err) {
+        failed.value = err;
+    }
+}
+async function submitPassword() {
+    try {
+        changeName.value = false;
+        await axios.patch(`${API}/user/${user_id.value}`, {
+            passwort: password.value
         });
         window.location.reload();
     } catch (err) {
@@ -76,7 +88,13 @@ async function submitName() {
                 </tr>
                 <tr>
                     <td>Passwort</td>
-                    <td>••••••••••••••</td>
+                    <td v-if="changePass">
+                        <form @submit.prevent="submitPassword">
+                            <input type="password" placeholder="password" v-model="password" required>
+                            <button type="submit" class="apply-button">Apply</button>
+                        </form>
+                    </td>
+                    <td v-else>••••••••••••••</td>
                     <td><button class="change-button" @click="changePass = true">ändern</button></td>
                 </tr>
             </table>
