@@ -564,6 +564,10 @@ app.patch("/user/:user_id", async (req, res) => {
 
     for (const key in updates) {
         if (key != "pk_user_id") {
+            if (key == "passwort") {
+                const passwort = updates[key];
+                updates[key] = crypto.createHash("sha256").update(passwort).digest("hex");
+            }
             columns.push(`${key} = ?`);
             values.push(updates[key]);
         } else {
