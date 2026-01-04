@@ -45,6 +45,8 @@ async function submitName() {
             username: username.value
         });
         window.location.reload();
+        failed.value = "";
+
     } catch (err) {
         failed.value = err;
     }
@@ -56,6 +58,16 @@ async function submitPassword() {
             passwort: password.value
         });
         window.location.reload();
+        failed.value = "";
+
+    } catch (err) {
+        failed.value = err;
+    }
+}
+async function delUser() {
+    try {
+        await axios.delete(`${API}/user/${user_id.value}`);
+        failed.value = "";
     } catch (err) {
         failed.value = err;
     }
@@ -105,7 +117,7 @@ async function submitPassword() {
                 </tr>
             </table>
             <div id="del-container">
-                <button id="del-button">Account löschen</button>
+                <button @click="delUser" id="del-button">Account löschen</button>
             </div>
             <div id="error">{{ failed }}</div>
         </div>
