@@ -436,6 +436,8 @@ app.delete("/user/:user_id", async (req, res) => {
             return res.status(404).json({error: "User not found"});
         }
 
+        res.clearCookie("auth");
+
         res.status(200).json({message: "User deleted successfully"});
     } catch (err) {
         console.error(err);
