@@ -1,16 +1,22 @@
 <script setup>
+import axios from "axios";
 import { ref, onMounted } from "vue";
 import { fetchData } from "./DataAccess.mjs"
 
+const API = "http://localhost:3000"
+
 let logged = ref(false);
 const failed = ref("");
+const changeName = ref(false);
+const changePass = ref(false);
 
 const username = ref("");
+const user_id = ref();
 
 onMounted(async () => {
     const data = await fetchData();
     username.value = data.user.username;
-
+    user_id.value = data.user.pk_user_id;
 });
 
 async function loginSubmit() {
@@ -22,6 +28,18 @@ async function loginSubmit() {
         } else {
             failed.value = `Error Code ${err.status}: Something went wrong during login process.`;
         }
+    }
+}
+async function submitName() {
+    console.log(user_id.value);
+    try {
+        changeName.value = false;
+        await axios.patch(`${API}/user/${user_id.value}`, {
+            username: username.value
+        });
+        window.location.reload();
+    } catch (err) {
+        failed.value = err;
     }
 }
 </script>
@@ -47,18 +65,25 @@ async function loginSubmit() {
                 </th>
                 <tr>
                     <td>Name</td>
-                    <td>{{ username }}</td>
-                    <td><button class="change-button">ändern</button></td>
+                    <td v-if="changeName">
+                        <form @submit.prevent="submitName">
+                            <input type="text" :placeholder="username" v-model="username" required>
+                            <button type="submit" class="apply-button">Apply</button>
+                        </form>
+                    </td>
+                    <td v-else>{{ username }}</td>
+                    <td><button class="change-button" @click="changeName = true">ändern</button></td>
                 </tr>
                 <tr>
                     <td>Passwort</td>
                     <td>••••••••••••••</td>
-                    <td><button class="change-button">ändern</button></td>
+                    <td><button class="change-button" @click="changePass = true">ändern</button></td>
                 </tr>
             </table>
             <div id="del-container">
                 <button id="del-button">Account löschen</button>
             </div>
+            <div id="error">{{ failed }}</div>
         </div>
     </template>
 </template>
@@ -126,44 +151,52 @@ button {
 
 
 #error {
-  color:crimson;
+    color: crimson;
 }
 
-.auth-card{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.auth-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
-  width: min(520px, 92vw);
-  padding: 26px;
+    width: min(520px, 92vw);
+    padding: 26px;
 
-  background: var(--main-dark);
-  border: 6px solid var(--field-dark);
-  border-radius: 8px;
+    background: var(--main-dark);
+    border: 6px solid var(--field-dark);
+    border-radius: 8px;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  color: var(--text-dark);
+    font-family: "Goodland", system-ui, sans-serif;
+    color: var(--text-dark);
 }
 
-.headline{
-  text-align: left;
-  margin-bottom: 14px;
+.headline {
+    text-align: left;
+    margin-bottom: 14px;
 }
 
-.btn-primary{
-  margin-top: 16px;
-  width: 100%;
-  height: 42px;
+.apply-button {
+    color: var(--text-dark);
+    background: var(--today-dark);
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
 
-  font-family: "Goodland", system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+.btn-primary {
+    margin-top: 16px;
+    width: 100%;
+    height: 42px;
 
-  color: var(--text-dark);
-  background: var(--today-dark);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
+    font-family: "Goodland", system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+
+    color: var(--text-dark);
+    background: var(--today-dark);
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
 }
 </style>
