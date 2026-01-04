@@ -22,7 +22,13 @@ onMounted(async () => {
 
 async function loginSubmit() {
     try {
+        await axios.post(
+            `${API}/login`,
+            { username: username.value, passwort: password.value },
+            { withCredentials: true }
+        );
         logged.value = true;
+        failed.value = "";
     } catch (err) {
         if (err.status == 401) {
             failed.value = "Falsches Passwort."
