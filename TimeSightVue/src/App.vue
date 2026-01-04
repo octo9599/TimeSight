@@ -20,13 +20,11 @@ function changeVisibleAdd() {
 </script>
 
 <template>
-	<TopBar />
+	<TopBar :showAcc="router.currentRoute.value.path != '/auth'"/>
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar @addTask="changeVisibleAdd" />
+			<SideBar v-if="router.currentRoute.value.path != '/auth'" @addTask="changeVisibleAdd" />
 		</div>
-		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
-		<!--<p id="test">Hello World this is a paragraph</p>-->
 		<div id="test">
 			<RouterView />
 			<div v-if="isAddVisible" class="modal-overlay" @click.self="changeVisibleAdd">
@@ -51,6 +49,7 @@ function changeVisibleAdd() {
 
 #sidebar {
 	grid-column: 1;
+	background-color: var(--main-dark);
 }
 
 #test {
