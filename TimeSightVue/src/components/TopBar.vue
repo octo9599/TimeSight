@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+
+	const props = defineProps({showAcc: Boolean});
+
+</script>
 
 <template>
 	<div id="topbar-container">
@@ -15,7 +19,7 @@
 			<span class="highlighted">T</span>ime<span class="highlighted">S</span>ight
 		</h1>
 		<!-- actual account icon will go here once available -->
-		<section id="account-icon-container" class="topbar-icon-containers">
+		<section v-if="showAcc" id="account-icon-container" class="topbar-icon-containers">
 			<img id="acc-icon" alt="Account Menu" class="icons" src="@/assets/images/TEMPORARY-Account-Icon.png">
 		</section>
 	</div>
