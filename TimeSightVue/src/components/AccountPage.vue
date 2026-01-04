@@ -67,6 +67,7 @@ async function submitPassword() {
 async function delUser() {
     try {
         await axios.delete(`${API}/user/${user_id.value}`);
+        window.location.reload();
         failed.value = "";
     } catch (err) {
         failed.value = err;
