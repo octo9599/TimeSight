@@ -1,99 +1,99 @@
 <script setup>
-	import {computed, onMounted, ref, nextTick, watch } from "vue";
-	import {fetchData, formatDate, getTermineByDate} from "./components/DataAccess.mjs";
-	import {useUserStore} from "@/stores/user";
-	import {useLoadTaskStore} from '@/stores/loadTask.ts';
-	import axios from 'axios';
-	import TaskView from "./components/TaskView.vue";
+import { computed, onMounted, ref, nextTick, watch } from "vue";
+import { fetchData, formatDate, getTermineByDate } from "./components/DataAccess.mjs";
+import { useUserStore } from "@/stores/user";
+import { useLoadTaskStore } from '@/stores/loadTask.ts';
+import axios from 'axios';
+import TaskView from "./components/TaskView.vue";
 
-	const API = "http://localhost:3000";
+const API = "http://localhost:3000";
 
-	const toDoTermine = ref([]);
-	const overTermine = ref([]);
-	const doneTermine = ref([]);
-	const dates = ref([]);
-	const datesIn = ref([]);
+const toDoTermine = ref([]);
+const overTermine = ref([]);
+const doneTermine = ref([]);
+const dates = ref([]);
+const datesIn = ref([]);
 
-	const userStore = useUserStore();
-	const loadTaskStore = useLoadTaskStore();
+const userStore = useUserStore();
+const loadTaskStore = useLoadTaskStore();
 
-	const isTerminSelected = ref(false);
-	const terminViewRef = ref(null);
+const isTerminSelected = ref(false);
+const terminViewRef = ref(null);
 
-	const view = ref("todo");
-	const list = computed(() => {
-		if (view.value === "todo") return toDoTermine.value;
-		if (view.value === "over") return overTermine.value;
-		if (view.value === "done") return doneTermine.value;
-		return [];
-	});
+const view = ref("todo");
+const list = computed(() => {
+	if (view.value === "todo") return toDoTermine.value;
+	if (view.value === "over") return overTermine.value;
+	if (view.value === "done") return doneTermine.value;
+	return [];
+});
 
-	const sortedDatesIn = computed(() => {
-		const arr = [...datesIn.value];
-		return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
-	});
+const sortedDatesIn = computed(() => {
+	const arr = [...datesIn.value];
+	return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
+});
 
-	const sortedDates = computed(() => {
-		const arr = [...dates.value];
-		if (view.value === "todo") {
-			return arr.sort((a, b) => a.getTime() - b.getTime());
-		} else {
-			return arr.sort((a, b) => b.getTime() - a.getTime());
-		}
-	});
+const sortedDates = computed(() => {
+	const arr = [...dates.value];
+	if (view.value === "todo") {
+		return arr.sort((a, b) => a.getTime() - b.getTime());
+	} else {
+		return arr.sort((a, b) => b.getTime() - a.getTime());
+	}
+});
 
-	async function viewTermin(id) {
-		isTerminSelected.value = true;
-		await nextTick();
-		terminViewRef.value.init_termin(id);
+async function viewTermin(id) {
+	isTerminSelected.value = true;
+	await nextTick();
+	terminViewRef.value.init_termin(id);
+}
+
+async function change_erledigt(event, id) {
+
+	try {
+		console.log((await axios.patch(`${API}/termin/${id}`, {
+			ist_erledigt: event.target.checked
+		})).data);
+
+	} catch (err) {
+		console.log(err);
 	}
 
-	async function change_erledigt(event, id) {
+	loadTermine();
 
-		try {
-			console.log((await axios.patch(`${API}/termin/${id}`, {
-				ist_erledigt: event.target.checked
-			})).data);
+}
 
-		} catch (err) {
-			console.log(err);
-		}
-
+function closeTermin(is_changed) {
+	if (is_changed) {
 		loadTermine();
-
 	}
+	isTerminSelected.value = false;
+}
 
-	function closeTermin(is_changed) {
-		if(is_changed) {
+async function loadTermine() {
+	const data = await fetchData();
+	toDoTermine.value = data.toDoTermine;
+	overTermine.value = data.overTermine;
+	doneTermine.value = data.doneTermine;
+	datesIn.value = data.datesIn;
+	dates.value = data.dates;
+}
+
+
+watch(
+	() => loadTaskStore.shouldLoad,
+	(newVal) => {
+		if (newVal === true) {
 			loadTermine();
+			loadTaskStore.shouldLoad = false
 		}
-		isTerminSelected.value = false;
-	}
+	},
+	{ immediate: true }
+);
 
-	async function loadTermine() {
-		const data = await fetchData();
-		toDoTermine.value = data.toDoTermine;
-		overTermine.value = data.overTermine;
-		doneTermine.value = data.doneTermine;
-		datesIn.value = data.datesIn;
-		dates.value = data.dates;
-	}
-
-
-	watch(
-		() => loadTaskStore.shouldLoad,
-		(newVal) => {
-			if (newVal === true) {
-				loadTermine();
-				loadTaskStore.shouldLoad = false
-			}
-		},
-		{ immediate: true }
-	);
-
-	onMounted(async () => {
-		loadTermine();
-	});
+onMounted(async () => {
+	loadTermine();
+});
 </script>
 
 <template>
@@ -120,26 +120,25 @@
 					</dt>
 				</template>
 				<dd>
-					<a href="#" class="termin" @click.prevent="viewTermin(termin.pk_termin_id)"><h3>{{ termin.bezeichnung }}</h3></a>
-					<input type="checkbox" :checked="termin.ist_erledigt === 1" @change="change_erledigt($event, termin.pk_termin_id)"/>
+					<a href="#" class="termin" @click.prevent="viewTermin(termin.pk_termin_id)">
+						<h3>{{ termin.bezeichnung }}</h3>
+					</a>
+					<input type="checkbox" :checked="termin.ist_erledigt === 1"
+						@change="change_erledigt($event, termin.pk_termin_id)" />
 				</dd>
 			</template>
 		</template>
 	</dl>
 
 	<div v-if="isTerminSelected" class="modal-overlay" @click.self="closeTermin(true)">
-		<TaskView
-			ref="terminViewRef"
-			class="modal-window"
-			@close="closeTermin"
-		/>
+		<TaskView ref="terminViewRef" class="modal-window" @close="closeTermin" />
 	</div>
 </template>
 
 <style scoped>
 * {
-	font-family: JockeyOne;
-	src: url('@/assets/fonts/JockeyOne-Regular.ttf');
+	/* font-family: JockeyOne; */
+	/* src: url('@/assets/fonts/JockeyOne-Regular.ttf'); */
 	color: var(--text-dark);
 }
 
@@ -156,7 +155,8 @@ dt {
 	margin-left: 1%;
 }
 
-dd, button {
+dd,
+button {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -205,31 +205,49 @@ li {
 
 /* TaskView Window */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.35);
 
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
-  z-index: 1000;
+	z-index: 1000;
 }
 
 .modal-window {
-  background: var(--main-dark);
-  border-radius: 12px;
-  width: min(600px, 90vw);
-  max-height: 85vh;
-  overflow-y: auto;
+	background: var(--main-dark);
+	border-radius: 12px;
+	width: min(600px, 90vw);
+	max-height: 85vh;
+	overflow-y: auto;
 
-  padding: 1.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+	padding: 1.5rem;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 
-  animation: modalIn 0.2s ease-out;
+	animation: modalIn 0.2s ease-out;
 }
 
+input[type="checkbox"] {
+	/* ...existing styles */
+	display: grid;
+	place-content: center;
+}
+
+input[type="checkbox"]::before {
+	content: "";
+	width: 1em;
+	height: 1em;
+	transform: scale(0);
+	transition: 120ms transform ease-in-out;
+	box-shadow: inset 1em 1em var(--done-dark);
+}
+
+input[type="checkbox"]:checked::before {
+	transform: scale(1);
+}
 </style>
