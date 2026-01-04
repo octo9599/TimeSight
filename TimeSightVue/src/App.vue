@@ -25,8 +25,6 @@ function changeVisibleAdd() {
 		<div id="sidebar">
 			<SideBar @addTask="changeVisibleAdd" />
 		</div>
-		<!-- #test exists just to show the correct bg-color currently, should be removed when work on the actual calendar UI begins -->
-		<!--<p id="test">Hello World this is a paragraph</p>-->
 		<div id="test">
 			<RouterView />
 			<div v-if="isAddVisible" class="modal-overlay" @click.self="changeVisibleAdd">
