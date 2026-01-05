@@ -16,6 +16,7 @@ const input = ref(null);
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 const userId = ref(0);
+const markierungsfarbe = ref("");
 const disableCreate = ref(false);
 
 onMounted(async () => {
@@ -71,6 +72,21 @@ async function checkIfInviteCodeExists(code) {
     }
 }
 
+function extractGroupIdFromResponse(data) {
+    // Handles multiple backend shapes:
+    // - array of group objects -> take first.pk_group_id
+    // - single object with pk_group_id
+    // - object with nested keys (try common names)
+    if (!data) return null;
+    if (Array.isArray(data) && data.length > 0) {
+        return data[0].pk_group_id ?? data[0].fk_group_id ?? data[0].id ?? null;
+    }
+    if (typeof data === 'object') {
+        return data.pk_group_id ?? data.fk_group_id ?? data.id ?? null;
+    }
+    return null;
+}
+
 async function createGroup() {
     if (!gruppenname.value.trim()) {
         error.value = "Bitte geben Sie einen Gruppennamen ein.";
@@ -89,6 +105,42 @@ async function createGroup() {
             gruppenname: gruppenname.value.trim(),
             invite_code: inviteCode.value
         });
+
+        // After creating the group, fetch it by invite_code to get the pk_group_id
+        let groupId = null;
+        try {
+            const getRes = await axios.get(`${API}/gruppe`, {
+                params: { invite_code: inviteCode.value }
+            });
+            groupId = extractGroupIdFromResponse(getRes.data);
+
+            // Fallback: maybe POST returned the created group id
+            if (!groupId && response && response.data) {
+                groupId = extractGroupIdFromResponse(response.data);
+            }
+
+            if (!groupId) {
+                throw new Error("Could not determine group id after creation.");
+            }
+        } catch (err) {
+            console.error("Error fetching group by invite code:", err);
+            throw new Error("Gruppe wurde erstellt, aber die Gruppen-ID konnte nicht ermittelt werden.");
+        }
+
+        // Insert into Gruppe_User (Zwischentabelle)
+        try {
+            await axios.post(`${API}/gruppe_user`, {
+                markierungsfarbe: markierungsfarbe.value, // must be hex like "#rrggbb",
+                ist_admin: 1,
+                kann_bearbeiten: 1,
+                kann_loeschen: 1,
+                group_id: groupId,
+                user_id: userId.value
+            });
+        } catch (err) {
+            console.error("Error inserting into Gruppe_User:", err);
+            throw new Error("Gruppe wurde erstellt, aber das Hinzufügen des Benutzers zur Gruppe ist fehlgeschlagen.");
+        }
 
         disableCreate.value = true;
 
@@ -113,6 +165,16 @@ async function createGroup() {
                 <label for="groupName">Gruppenname</label>
                 <input id="groupName" type="text" v-model="gruppenname" placeholder="Meine Gruppe" :disabled="isLoading"
                     ref="input" />
+            </div>
+
+            <!-- NEW: markierungsfarbe input -->
+            <div class="form-group">
+                <label for="markierungsfarbe">Markierungsfarbe</label>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <input id="markierungsfarbe" type="color" v-model="markierungsfarbe" :disabled="isLoading" />
+                    <input type="text" v-model="markierungsfarbe" readonly style="width:8rem; padding:0.4rem; border-radius:4px;" />
+                </div>
+                <small>Wählen Sie eine Farbe für die Termine dieser Gruppe (accountgebunden)</small>
             </div>
 
             <div v-if="inviteCode" class="invite-code">
