@@ -1,34 +1,43 @@
 <script setup>
-import SideBar from "@/components/SideBar.vue";
-import TopBar from "@/components/TopBar.vue";
-import AddTask from "./components/AddTask.vue";
-import { useLoadTaskStore } from '@/stores/loadTask.ts';
-import { useRouter } from "vue-router";
-import { ref } from "vue";
+	import SideBar from "@/components/SideBar.vue";
+	import TopBar from "@/components/TopBar.vue";
+	import AddTask from "./components/AddTask.vue";
+	import { useLoadTaskStore } from '@/stores/loadTask.ts';
+	import { useRouter } from "vue-router";
+	import { ref } from "vue";
+	import AccPopup from "./components/AccPopup.vue";
 
-const router = useRouter();
-const loadTaskStore = useLoadTaskStore();
-const isAddVisible = ref(false);
+	const router = useRouter();
+	const loadTaskStore = useLoadTaskStore();
+	const isAddVisible = ref(false);
 
-function changeVisibleAdd() {
-	isAddVisible.value = !isAddVisible.value;
-	if (!isAddVisible.value) {
-		loadTaskStore.shouldLoad = true;
+	const isPopupVisible = ref(false);
+
+	function addChangeVisibility() {
+		isAddVisible.value = !isAddVisible.value;
+		if (!isAddVisible.value) {
+			loadTaskStore.shouldLoad = true;
+		}
 	}
-}
 
+	function popupChangeVisibility(pos) {
+		isPopupVisible.value = !isPopupVisible.value;
+	}
 </script>
 
 <template>
-	<TopBar :showAcc="router.currentRoute.value.path != '/auth'"/>
+	<TopBar :showAcc="router.currentRoute.value.path != '/auth'" @showPopup="popupChangeVisibility"/>
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar v-if="router.currentRoute.value.path != '/auth'" @addTask="changeVisibleAdd" />
+			<SideBar v-if="router.currentRoute.value.path != '/auth'" @addTask="addChangeVisibility" />
 		</div>
 		<div id="test">
+			<div v-if="isPopupVisible" class="popup-overlay" @click.self="popupChangeVisibility">
+				<AccPopup class="popup-window"/>
+			</div>
 			<RouterView />
-			<div v-if="isAddVisible" class="modal-overlay" @click.self="changeVisibleAdd">
-				<AddTask @close="changeVisibleAdd" class="modal-window" />
+			<div v-if="isAddVisible" class="modal-overlay" @click.self="addChangeVisibility">
+				<AddTask @close="addChangeVisibility" class="modal-window" />
 			</div>
 		</div>
 	</div>
@@ -87,4 +96,22 @@ function changeVisibleAdd() {
 
 	animation: modalIn 0.2s ease-out;
 }
+
+.popup-overlay {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: start;
+	justify-content: end;
+	background: rgba(0, 0, 0, 0.35);
+
+	z-index: 1000;
+}
+
+.popup-window {
+  	position: fixed;
+	gap: 0.3rem;
+}
+
+
 </style>
