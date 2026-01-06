@@ -7,9 +7,9 @@
 <template>
 	<div id="topbar-container">
 		<section class="topbar-icon-containers">
-			<a href="/">
+			<router-link to="/">
 				<img id="eye-icon" alt="TimeSight Logo" class="icons" src="@/assets/images/TISI-Logo.png">
-			</a>
+			</router-link>
 		</section>
 		<!-- janky but working way to make T and S colored differently
 		(and if it's not all on one line it doesn't even look that ugly (in the code, not on the site lol) anymore...) -->
