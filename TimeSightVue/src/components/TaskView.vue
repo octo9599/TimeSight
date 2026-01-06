@@ -1,6 +1,6 @@
 <script setup>
     import axios from 'axios';
-    import { onMounted, ref } from 'vue';
+    import { ref } from 'vue';
 
     const id = ref(0);
     const bezeichnung = ref("");
