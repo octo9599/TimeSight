@@ -1,6 +1,7 @@
 <script setup>
 
 	const props = defineProps({showAcc: Boolean});
+	const emit = defineEmits(['showPopup']);
 
 </script>
 
@@ -20,7 +21,9 @@
 		</h1>
 		<!-- actual account icon will go here once available -->
 		<section v-if="showAcc" id="account-icon-container" class="topbar-icon-containers">
-			<img id="acc-icon" alt="Account Menu" class="icons" src="@/assets/images/TEMPORARY-Account-Icon.png">
+			<a href="#" @click.prevent="emit('showPopup')">
+				<img id="acc-icon" alt="Account Menu" class="icons" src="@/assets/images/TEMPORARY-Account-Icon.png">
+			</a>
 		</section>
 	</div>
 </template>
