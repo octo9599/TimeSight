@@ -4,8 +4,9 @@ import AuthPage from '@/AuthPage.vue';
 import CalendarView from '@/CalendarView.vue';
 import Groups from '@/Groups.vue';
 import logoutTest from '@/apiTests/logoutTest.vue';
-import {useUserStore} from '@/stores/user';
 import AccountPage from '@/components/AccountPage.vue';
+import Imprint from '@/Imprint.vue';
+import {useUserStore} from '@/stores/user';
 
 const router: Router = createRouter({
 	// would be used if the root of the app is not stored at /
@@ -18,7 +19,8 @@ const router: Router = createRouter({
 		{path: "/logout", component: logoutTest},
 		{path: "/list", component: ListView},
 		{path: "/groups", component: Groups},
-		{path: "/account", component: AccountPage}
+		{path: "/account", component: AccountPage},
+		{path: "/imprint", component: Imprint}
 	],
 });
 
