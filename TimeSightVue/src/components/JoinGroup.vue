@@ -19,8 +19,6 @@ const userId = ref(0);
 const disableCreate = ref(false);
 const groupName = ref("");
 
-
-
 onMounted(async () => {
     input.value.focus();
     await userStore.fetchUser();
@@ -35,42 +33,12 @@ async function checkIfGroupExists() {
             params: { invite_code: inviteCode.value }
         });
         groupId.value = res.data[0].pk_group_id;
-        console.log(res.data[0]);
-        console.log(groupId.value);
-        console.log(res.data); // TODO should be removed later
         return res.data.length > 0 ? true : false;
     } catch (error) {
         console.error("Error checking if group exists:", error);
         return false;
     }
 }
-
-// async function joinGroup() {
-//     if (!inviteCode.value.trim()) {
-//         error.value = "Bitte geben Sie einen Gruppennamen ein.";
-//         return;
-//     }
-
-//     if(!await checkIfGroupExists()) {
-//         error.value = "Gruppe nicht gefunden.";
-//         return;
-//     }
-    
-//     try {
-//         await axios.post(`${API}/gruppe_user`, {
-//             markierungsfarbe: null,
-//             ist_admin: 0,
-//             kann_bearbeiten: 0,
-//             kann_loeschen: 0,
-//             group_id: groupId.value,
-//             user_id: userId.value
-//         });
-//         emit('group-joined');
-//     } catch (error) {
-//         console.error("Error joining group:", error);
-//         error.value = "Fehler beim Beitreten der Gruppe. Bitte versuchen Sie es später erneut.";
-//     }
-// }
 
 async function joinGroup() {
     if (!inviteCode.value.trim()) {
@@ -91,10 +59,6 @@ async function joinGroup() {
 
     isLoading.value = true;
     error.value = "";
-
-    console.log(groupId.value);
-    console.log(userId.value);
-    console.log(inviteCode.value);
     
 
     try {
@@ -115,7 +79,6 @@ async function joinGroup() {
         isLoading.value = false;
     }
 }
-
 </script>
 
 <template>
