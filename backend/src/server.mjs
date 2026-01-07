@@ -614,11 +614,11 @@ app.patch("/gruppe/:group_id", async (req, res) => {
     const values = [];
 
     for (const key in updates) {
-        if (key != "pk_group_id" && key != "invite_code") {
+        if (key != "pk_group_id") {
             columns.push(`${key} = ?`);
             values.push(updates[key]);
         } else {
-            return res.status(400).json({error: "Updates to the primary key or the invite_code are not allowed."});
+            return res.status(400).json({error: "Updates to the primary key are not allowed."});
         }
     }
 
