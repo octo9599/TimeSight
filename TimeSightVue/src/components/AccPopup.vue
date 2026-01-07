@@ -1,10 +1,11 @@
 <script setup>
+    const emit = defineEmits(['close']);
 
 </script>
 
 <template>
     <div id="content">
-        <router-link class="links" to="/account">Account</router-link>
+        <router-link class="links" to="/account" @click="emit('close')">Account</router-link>
         <button id="mode-btn"> LightMode</button> 
         <router-link class="links" id="logout" to="/logout">Log out</router-link>
     </div>

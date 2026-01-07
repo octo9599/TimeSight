@@ -33,7 +33,7 @@
 		</div>
 		<div id="test">
 			<div v-if="isPopupVisible" class="popup-overlay" @click.self="popupChangeVisibility">
-				<AccPopup class="popup-window"/>
+				<AccPopup @close="popupChangeVisibility" class="popup-window"/>
 			</div>
 			<RouterView />
 			<div v-if="isAddVisible" class="modal-overlay" @click.self="addChangeVisibility">
