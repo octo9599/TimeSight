@@ -1,65 +1,91 @@
+<!-- Does not join group if user is already in group but show user is already in group -->
 <script setup>
 import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
-import axios from 'axios';
 
 const emit = defineEmits(['close', 'group-joined']);
-
-const API = "http://localhost:3000";
 
 const inviteCode = ref("");
 const isLoading = ref(false);
 const error = ref("");
-const input = ref(null);
+const inviteCodeInput = ref(null);
+
+// For confirmation step
+const phase = ref("input"); // "input" or "confirm"
 const groupId = ref(null);
+const groupName = ref("");
+const alreadyInGroup = ref(false);
+
+// Current user
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
-const userId = ref(0);
-const disableCreate = ref(false);
-const groupName = ref("");
+const userId = ref(null);
+
+const API = "http://localhost:3000";
 
 onMounted(async () => {
-    input.value.focus();
     await userStore.fetchUser();
-    userId.value = user.value.pk_user_id;
-    console.log(userId.value);
-    
+    userId.value = user.value?.pk_user_id;
+    inviteCodeInput.value.focus();
 });
 
+// Check invite code, group exists, and membership
 async function checkIfGroupExists() {
     try {
         const res = await axios.get(`${API}/gruppe`, {
-            params: { invite_code: inviteCode.value }
+            params: { invite_code: inviteCode.value.trim() }
         });
-        groupId.value = res.data[0].pk_group_id;
-        return res.data.length > 0 ? true : false;
-    } catch (error) {
-        console.error("Error checking if group exists:", error);
+
+        if (!Array.isArray(res.data) || res.data.length === 0) {
+            return false;
+        }
+
+        const group = res.data[0];
+        groupId.value = group.pk_group_id;
+        groupName.value = group.gruppenname;
+
+        // Check if user is already in the group
+        try {
+            const membership = await axios.get(`${API}/gruppe_user`, {
+                params: {
+                    group_id: groupId.value,
+                    user_id: userId.value
+                }
+            });
+            alreadyInGroup.value = Array.isArray(membership.data) && membership.data.length > 0;
+        } catch (err) {
+            console.error("Error checking membership:", err);
+            alreadyInGroup.value = false;
+        }
+
+        return true;
+    } catch (err) {
+        console.error("Error checking group:", err);
         return false;
     }
 }
 
-async function joinGroup() {
+// First step: validate the code and show confirmation UI
+async function prepareJoinGroup() {
+    error.value = "";
     if (!inviteCode.value.trim()) {
         error.value = "Bitte geben Sie einen Einladungscode ein.";
         return;
     }
-
-    if (!userId.value) {
-        error.value = "Benutzer nicht geladen. Bitte erneut versuchen.";
-        return;
-    }
-
     const exists = await checkIfGroupExists();
-    if (!exists || !groupId.value) {
+    if (!exists) {
         error.value = "Gruppe nicht gefunden.";
         return;
     }
+    phase.value = "confirm";
+}
 
+// Perform the actual join (or finish if already in)
+async function joinGroup() {
     isLoading.value = true;
     error.value = "";
-    
 
     try {
         await axios.post(`${API}/gruppe_user`, {
@@ -79,37 +105,102 @@ async function joinGroup() {
         isLoading.value = false;
     }
 }
+
+// Go back to the invite-code input
+function goBack() {
+    phase.value = "input";
+    error.value = "";
+    alreadyInGroup.value = false;
+}
 </script>
 
+<!-- Does not join group if user is already in group but show user is already in group -->
 <template>
     <div class="form-container">
-        <h2>Einer Gruppe beitreten</h2>
+        <!-- PHASE: INPUT INVITE CODE -->
+        <div v-if="phase === 'input'">
+            <h2>Einer Gruppe beitreten</h2>
+            <form @submit.prevent="prepareJoinGroup" class="form">
+                <div class="form-group">
+                    <label for="inviteCode">Einladungscode</label>
+                    <input
+                        id="inviteCode"
+                        type="text"
+                        v-model="inviteCode"
+                        placeholder="Einladungscode"
+                        :disabled="isLoading"
+                        ref="inviteCodeInput"
+                    />
+                </div>
 
-        <form @submit.prevent="joinGroup" class="form">
-            <div class="form-group">
-                <label for="inviteCode">Einladungscode</label>
-                <input id="inviteCode" type="text" v-model="inviteCode" placeholder="Einladungscode"
-                    :disabled="isLoading" ref="input" />
-            </div>
+                <div v-if="error" class="error-message">
+                    {{ error }}
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click="emit('close')"
+                        :disabled="isLoading"
+                    >
+                        Schließen
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        :disabled="isLoading || !inviteCode.trim()"
+                    >
+                        Weiter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PHASE: CONFIRM JOIN -->
+        <div v-if="phase === 'confirm'">
+            <h2>Bestätige Beitritt</h2>
+            <p>
+                Du bist dabei, der Gruppe
+                <i>{{ groupName }}</i> beizutreten.
+            </p>
+
+            <p v-if="alreadyInGroup" class="already-message">
+                👍 Du bist bereits in der Gruppe <i>{{ groupName }}</i>.
+            </p>
 
             <div v-if="error" class="error-message">
                 {{ error }}
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" @click="emit('close')" :disabled="isLoading">
-                    <span v-if="!inviteCode">Abbrechen</span>
-                    <span v-else>Schließen</span>
+                <button class="btn btn-secondary" @click="goBack" :disabled="isLoading">
+                    Zurück
                 </button>
-                <button type="submit" class="btn btn-primary"
-                    :disabled="isLoading || !inviteCode.trim() || disableCreate">
-                    <span v-if="!disableCreate">Gruppe beitreten</span>
-                    <span v-else>OK</span>
+
+                <button
+                    v-if="!alreadyInGroup"
+                    class="btn btn-primary"
+                    @click="joinGroup"
+                    :disabled="isLoading"
+                >
+                    <span v-if="isLoading">Beitreten...</span>
+                    <span v-else>Beitreten</span>
+                </button>
+
+                <button
+                    v-if="alreadyInGroup"
+                    class="btn btn-primary"
+                    @click="emit('close')"
+                    :disabled="isLoading"
+                >
+                    Schließen
                 </button>
             </div>
-        </form>
+        </div>
     </div>
 </template>
+
 
 <style scoped>
 .form-group {
@@ -173,5 +264,11 @@ input[type="text"] {
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 1rem;
+}
+
+.already-message {
+    margin-top: 1rem;
+    color: green;
+    font-weight: bold;
 }
 </style>
