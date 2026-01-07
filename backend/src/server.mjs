@@ -284,13 +284,14 @@ app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
 //Create a new Task
 app.post("/termin", async (req, res) => {
     const {bezeichnung, beschreibung, datum, uhrzeit, group_id, user_id} = req.body;
+    let desc = "";
 
     if (!bezeichnung || !datum || !uhrzeit || !group_id || !user_id) {
         return res.status(400).json({error: "bezeichnung, datum, uhrzeit, group_id and user_id are required to create a task."});
     }
 
-    if(!beschreibung) {
-        beschreibung = "";
+    if(beschreibung) {
+        desc = beschreibung;
     }
 
     try {
@@ -298,7 +299,7 @@ app.post("/termin", async (req, res) => {
         const result = await runQuery(
             //Termin (pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
             "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
-            [bezeichnung, beschreibung, date_time, group_id, user_id]
+            [bezeichnung, desc, date_time, group_id, user_id]
         );
 
         res.status(201).json({
@@ -424,6 +425,7 @@ app.delete("/user/:user_id", async (req, res) => {
             return res.status(400).json({error: "user_id is required to delete a user"});
         }
 
+        await runQuery("UPDATE Termin SET fk_ersteller_id = null WHERE fk_ersteller_id=?", [user_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_user_id = ?", [user_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_user_id = ?", [user_id]);
 
