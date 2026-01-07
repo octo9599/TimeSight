@@ -82,25 +82,21 @@ async function prepareJoinGroup() {
     phase.value = "confirm";
 }
 
-// Perform the actual join (or finish if already in)
-async function joinGroup() {
+//replacement for deprecated joinGroup, which sends an invite instead of immediately joining the group.
+async function sendInvite() {
     isLoading.value = true;
     error.value = "";
 
     try {
-        await axios.post(`${API}/gruppe_user`, {
-            markierungsfarbe: null,
-            ist_admin: 0,
-            kann_bearbeiten: 0,
-            kann_loeschen: 0,
-            group_id: groupId.value,
-            user_id: userId.value
+        await axios.post(`${API}/beitritt_anfrage`, {
+            user_id: userId.value,
+            group_id: groupId.value
         });
 
         emit('group-joined');
     } catch (err) {
-        console.error("Error joining group:", err.response?.data || err);
-        error.value = "Fehler beim Beitreten der Gruppe.";
+        //console.error("Error sending invite:", err.response?.data || err);
+        error.value = "Fehler beim abschicken der Anfrage";
     } finally {
         isLoading.value = false;
     }
@@ -161,8 +157,8 @@ function goBack() {
         <div v-if="phase === 'confirm'">
             <h2>Bestätige Beitritt</h2>
             <p>
-                Du bist dabei, der Gruppe
-                <i>{{ groupName }}</i> beizutreten.
+                Du bist dabei, eine Beitrittsanfrage an die Gruppe
+                <i>{{ groupName }}</i> zu senden.
             </p>
 
             <p v-if="alreadyInGroup" class="already-message">
@@ -181,11 +177,11 @@ function goBack() {
                 <button
                     v-if="!alreadyInGroup"
                     class="btn btn-primary"
-                    @click="joinGroup"
+                    @click="sendInvite"
                     :disabled="isLoading"
                 >
-                    <span v-if="isLoading">Beitreten...</span>
-                    <span v-else>Beitreten</span>
+                    <span v-if="isLoading">Senden...</span>
+                    <span v-else>Senden</span>
                 </button>
 
                 <button
