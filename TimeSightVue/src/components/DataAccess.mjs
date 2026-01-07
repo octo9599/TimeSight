@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {useUserStore} from '@/stores/user.ts';
 
-const API = "http://localhost:3000";
+export const API = "http://localhost:3000";
 
 export async function fetchData() {
 	try {
