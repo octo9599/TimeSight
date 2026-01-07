@@ -40,7 +40,6 @@ function closeCreateGroup() {
 
 // Handle successful group creation
 async function handleGroupCreated() {
-    closeCreateGroup();
     await fetchGroups();
 }
 

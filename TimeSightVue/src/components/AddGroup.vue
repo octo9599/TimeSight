@@ -145,7 +145,6 @@ async function createGroup() {
         disableCreate.value = true;
 
         emit('group-created', response.data);
-        // setTimeout(() => emit('close'), 2500);
     } catch (err) {
         console.error('Error creating group:', err);
         error.value = "Fehler beim Erstellen der Gruppe. Bitte versuchen Sie es später erneut.";
