@@ -48,10 +48,15 @@ async function createTermin() {
         Datum: <input type="date" v-model="datum" placeholder="Batum" required /> <br>
         Uhrzeit: <input type="time" v-model="uhrzeit" placeholder="Uhrzeit" /> <br>
         für Gruppe:
-        <select v-model="groupSelect" required>
-            <option v-for="group in groupsOfUser" :value="group.pk_group_id">{{ group.gruppenname }}</option>
-        </select> <br>
-        <button type="submit">Erstellen</button>
+        <span v-if="groupsOfUser.length > 0">
+            <select v-model="groupSelect" required>
+                <option v-for="group in groupsOfUser" :value="group.pk_group_id">{{ group.gruppenname }}</option>
+            </select> <br>
+            <button type="submit">Erstellen</button>
+        </span>
+        <div v-else>
+            An keinen Gruppen teilnehmend! Bitte <router-link to="/groups" @click="emit('close')">Gruppe erstellen oder beitreten.</router-link>
+        </div>
     </form>
 </template>
 
