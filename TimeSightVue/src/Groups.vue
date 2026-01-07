@@ -12,6 +12,7 @@ const joinGroupVisible = ref(false);
 const isLoading = ref(false);
 
 const inviteCode = ref("");
+const showCodes = ref({});
 
 // Fetch groups data
 const fetchGroups = async () => {
@@ -117,6 +118,12 @@ async function updateCode(group_id) {
     }
 
 }
+
+function showCode(group_id) {
+    showCodes.value[group_id] = !showCodes.value[group_id];
+
+}
+
 </script>
 
 <template>
@@ -126,10 +133,12 @@ async function updateCode(group_id) {
             <li v-for="group in groups" :key="group.pk_group_id" class="group-item">
                 <div class="group-header">
                     <h2>{{ group.gruppenname }}</h2>
-                    <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
-                    <div>{{ group.invite_code }}</div>
+                    <span>
+                        <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
+                        <button @click="showCode(group.pk_group_id)">Toggle Code</button>
+                        <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
+                    </span>
                 </div>
-                
                 <div v-if="usersInGroup[group.pk_group_id]" class="members-list">
                     <h3>Members:</h3>
                     <span class="member-names">
