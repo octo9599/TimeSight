@@ -360,7 +360,7 @@ app.post("/user", async (req, res) => {
 app.post("/gruppe_user", async (req, res) => {
     const {markierungsfarbe, ist_admin, kann_bearbeiten, kann_loeschen, group_id, user_id} = req.body;
     const params = [];
-    if (!ist_admin || !kann_bearbeiten || !kann_loeschen || !group_id || !user_id) {
+    if (ist_admin === undefined || kann_bearbeiten === undefined || kann_loeschen === undefined || !group_id || !user_id) {
         return res.status(400).json({error: "ist_admin, kann_bearbeiten, kann_loeschen, group_id and user_id are required to insert a user into a group."});
     }
     if (markierungsfarbe) {

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
+import axios from 'axios';
 
 const emit = defineEmits(['close', 'group-created']);
 

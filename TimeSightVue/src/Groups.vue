@@ -2,10 +2,12 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { fetchData } from "@/components/DataAccess.mjs";
 import AddGroup from "@/components/AddGroup.vue";
+import JoinGroup from "@/components/JoinGroup.vue";
 
 const groups = ref([]);
 const usersInGroup = ref({});
 const addGroupVisible = ref(false);
+const joinGroupVisible = ref(false);
 const isLoading = ref(false);
 
 // Fetch groups data
@@ -31,15 +33,32 @@ async function showCreateGroup() {
     await nextTick();
 }
 
-// Close modal
+// Close create group modal
 function closeCreateGroup() {
     addGroupVisible.value = false;
 }
 
 // Handle successful group creation
 async function handleGroupCreated() {
-    // closeCreateGroup();
-    await fetchGroups(); // Refresh the groups list
+    closeCreateGroup();
+    await fetchGroups();
+}
+
+// Show join group modal
+async function showJoinGroup() {
+    joinGroupVisible.value = true;
+    await nextTick();
+}
+
+// Close join group modal
+function closeJoinGroup() {
+    joinGroupVisible.value = false;
+}
+
+// Handle successful group joining
+async function handleGroupJoined() {
+    closeJoinGroup();
+    await fetchGroups();
 }
 </script>
 
@@ -68,11 +87,20 @@ async function handleGroupCreated() {
             <span v-if="isLoading">Lade Gruppen...</span>
             <span v-else>+ Neue Gruppe erstellen</span>
         </button>
+        <button @click="showJoinGroup" class="join-group-btn">
+            <span>Gruppe beitreten</span>
+        </button>
     </div>
 
     <!-- Create Group Modal -->
     <div v-if="addGroupVisible" class="modal-overlay" @click.self="closeCreateGroup">
         <AddGroup @close="closeCreateGroup" @keyup.esc="closeCreateGroup" @group-created="handleGroupCreated"
+            class="modal-window" />
+    </div>
+
+    <!-- Join Group Modal -->
+    <div v-if="joinGroupVisible" class="modal-overlay" @click.self="closeJoinGroup">
+        <JoinGroup @close="closeJoinGroup" @keyup.esc="closeJoinGroup" @group-joined="handleGroupJoined"
             class="modal-window" />
     </div>
 </template>
@@ -89,14 +117,14 @@ h1, h2, h3 {
     min-height: 60vh;
 }
 
-.create-group-btn {
+.create-group-btn, .join-group-btn {
     display: block;
     width: 100%;
     padding: 12px 20px;
     margin-top: 20px;
     background: var(--accent);
     color: white;
-    border: none;
+    border: var(--text-dark) solid 2px;
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 500;
@@ -104,11 +132,11 @@ h1, h2, h3 {
     transition: background-color 0.2s;
 }
 
-.create-group-btn:hover:not(:disabled) {
+.create-group-btn:hover:not(:disabled), .join-group-btn:hover:not(:disabled) {
     background: var(--accent-dark);
 }
 
-.create-group-btn:disabled {
+.create-group-btn:disabled, .join-group-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
