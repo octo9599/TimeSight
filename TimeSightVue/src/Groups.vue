@@ -1,14 +1,17 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { fetchData } from "@/components/DataAccess.mjs";
+import { fetchData, API } from "@/components/DataAccess.mjs";
 import AddGroup from "@/components/AddGroup.vue";
 import JoinGroup from "@/components/JoinGroup.vue";
+import axios from "axios";
 
 const groups = ref([]);
 const usersInGroup = ref({});
 const addGroupVisible = ref(false);
 const joinGroupVisible = ref(false);
 const isLoading = ref(false);
+
+const inviteCode = ref("");
 
 // Fetch groups data
 const fetchGroups = async () => {
@@ -59,6 +62,61 @@ async function handleGroupJoined() {
     closeJoinGroup();
     await fetchGroups();
 }
+
+function generateInviteCode() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let result = "";
+    for (let i = 0; i < 8; i++) {
+        result += letters[Math.floor(Math.random() * letters.length)];
+    }
+    inviteCode.value = result;
+}
+
+async function checkIfInviteCodeExists(code) {
+    try {
+        const res = await axios.get(`${API}/gruppe`, {
+            params: { invite_code: code }
+        });
+
+        // Common safe checks:
+        // - If backend returns an array of matches: return res.data.length > 0
+        // - If backend returns { exists: true/false }: return !!res.data.exists
+        // - If backend returns a single object when found or null when not: return !!res.data
+        if (Array.isArray(res.data)) {
+            return res.data.length > 0;
+        }
+        if (res.data && typeof res.data === 'object') {
+            if ('exists' in res.data) return !!res.data.exists;
+            // if object returned for found, empty object for not found -> check keys
+            return Object.keys(res.data).length > 0;
+        }
+        // fallback for scalar responses
+        return !!res.data;
+    } catch (err) {
+        console.error('Error checking invite code:', err);
+        // On network error we return false so we don't block creation — adjust if you prefer otherwise.
+        return false;
+    }
+}
+
+async function updateCode(group_id) {
+
+    try {
+        if(!group_id) {
+            throw new Error("updateCode() called without group_id");
+        }
+        do {
+            generateInviteCode();
+        } while (await checkIfInviteCodeExists(inviteCode.value));
+        await axios.patch(`${API}/gruppe/${group_id}`, {invite_code: inviteCode.value});
+        await fetchGroups();
+
+        
+    } catch (err) {
+        console.error(err);
+    }
+
+}
 </script>
 
 <template>
@@ -68,8 +126,10 @@ async function handleGroupJoined() {
             <li v-for="group in groups" :key="group.pk_group_id" class="group-item">
                 <div class="group-header">
                     <h2>{{ group.gruppenname }}</h2>
+                    <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
+                    <div>{{ group.invite_code }}</div>
                 </div>
-
+                
                 <div v-if="usersInGroup[group.pk_group_id]" class="members-list">
                     <h3>Members:</h3>
                     <span class="member-names">
