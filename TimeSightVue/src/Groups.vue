@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick } from 'vue';
 import { fetchData, API } from "@/components/DataAccess.mjs";
 import AddGroup from "@/components/AddGroup.vue";
 import JoinGroup from "@/components/JoinGroup.vue";
+import GroupManagement from './components/GroupManagement.vue';
 import axios from "axios";
 
 const groups = ref([]);
@@ -16,6 +17,8 @@ const showCodes = ref({});
 const inviteRequests = ref({});
 
 const isUserAdmin = ref({});
+
+const showGroupManagement = ref({});
 
 // Fetch groups data
 const fetchGroups = async () => {
@@ -36,7 +39,9 @@ const fetchGroups = async () => {
                 throw new Error(`No user entry found in group ${group.gruppenname}`)
             }
             isUserAdmin.value[group.pk_group_id] = user_perms.ist_admin == 1;
-            console.log(isUserAdmin.value[group.pk_group_id]);
+
+            //fill showGroupManagement
+            showGroupManagement.value[group.pk_group_id] = false;
         }
 
     } catch (error) {
@@ -185,6 +190,10 @@ async function answerInvite(request, is_accepted) {
 
 }
 
+function changeShowGroupMngmt(group_id) {
+    showGroupManagement.value[group_id] = !showGroupManagement.value[group_id];
+}
+
 </script>
 
 <template>
@@ -197,7 +206,11 @@ async function answerInvite(request, is_accepted) {
                     <span v-if="isUserAdmin[group.pk_group_id]">
                         <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
                         <button @click="showCode(group.pk_group_id)">Toggle Code</button>
+                        <button @click="changeShowGroupMngmt(group.pk_group_id)">Gruppe Verwalten</button>
                         <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
+                        <div v-if="showGroupManagement[group.pk_group_id]" class="modal-overlay" @click.self="changeShowGroupMngmt(group.pk_group_id)">
+                            <GroupManagement :group_id="group.pk_group_id" class="modal-window" @close="changeShowGroupMngmt"/>
+                        </div>
                     </span>
                 </div>
                 <div v-if="usersInGroup[group.pk_group_id]" class="members-list">
