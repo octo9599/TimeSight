@@ -1,6 +1,6 @@
 <script setup>
 
-    const props = defineProps(['group_id'])
+    const props = defineProps(['group'])
     const emit = defineEmits(['close']);
 
 </script>
