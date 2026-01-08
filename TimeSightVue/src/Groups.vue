@@ -15,6 +15,8 @@ const inviteCode = ref("");
 const showCodes = ref({});
 const inviteRequests = ref({});
 
+const isUserAdmin = ref({});
+
 // Fetch groups data
 const fetchGroups = async () => {
     try {
@@ -23,9 +25,20 @@ const fetchGroups = async () => {
         groups.value = data.groupsIn?.data || [];
         usersInGroup.value = data.groupUsers || {};
         for(const group of groups.value) {
+            //fetch invites per group
             inviteRequests.value[group.pk_group_id] = await fetchInviteRequests(group.pk_group_id);
+
+            //check if user is admin per group
+            const user_perms = (await axios.get(`${API}/gruppe_user`, {
+                params: { user_id: data.user.pk_user_id, group_id: group.pk_group_id }
+            })).data[0];
+            if(!user_perms) {
+                throw new Error(`No user entry found in group ${group.gruppenname}`)
+            }
+            isUserAdmin.value[group.pk_group_id] = user_perms.ist_admin == 1;
+            console.log(isUserAdmin.value[group.pk_group_id]);
         }
-        console.log(inviteRequests.value);
+
     } catch (error) {
         console.error('Error fetching groups:', error);
     } finally {
@@ -181,7 +194,7 @@ async function answerInvite(request, is_accepted) {
             <li v-for="group in groups" :key="group.pk_group_id" class="group-item">
                 <div class="group-header">
                     <h2>{{ group.gruppenname }}</h2>
-                    <span>
+                    <span v-if="isUserAdmin[group.pk_group_id]">
                         <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
                         <button @click="showCode(group.pk_group_id)">Toggle Code</button>
                         <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
@@ -196,7 +209,7 @@ async function answerInvite(request, is_accepted) {
                 <div v-else class="no-members">
                     No members found
                 </div>
-                <ul v-if="inviteRequests[group.pk_group_id] != null" class="invite-reqs">
+                <ul v-if="isUserAdmin[group.pk_group_id] && inviteRequests[group.pk_group_id] != null" class="invite-reqs">
                     Invite Requests:
                     <li v-for="request of inviteRequests[group.pk_group_id]">
                         {{ request.username }} will beitreten
