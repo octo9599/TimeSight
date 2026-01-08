@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
+import { getTokenSourceMapRange } from 'typescript';
 
 const emit = defineEmits(['close', 'group-joined']);
 
@@ -17,6 +18,8 @@ const phase = ref("input"); // "input" or "confirm"
 const groupId = ref(null);
 const groupName = ref("");
 const alreadyInGroup = ref(false);
+
+const alreadySentInvite = ref(false);
 
 // Current user
 const userStore = useUserStore();
@@ -58,6 +61,20 @@ async function checkIfGroupExists() {
         } catch (err) {
             console.error("Error checking membership:", err);
             alreadyInGroup.value = false;
+        }
+
+        //Check if user already sent an invide to this group
+        try {
+            const requests = (await axios.get(`${API}/gruppe/${groupId.value}/beitritt_anfrage`)).data;
+            for (const request of requests) {
+                if(request.fk_user_id == userId.value) {
+                    alreadySentInvite.value = true;
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error("Error checking if user already sent request to group; ", err);
+            alreadySentInvite.value = false;
         }
 
         return true;
@@ -107,6 +124,7 @@ function goBack() {
     phase.value = "input";
     error.value = "";
     alreadyInGroup.value = false;
+    alreadySentInvite.value = false
 }
 </script>
 
@@ -164,6 +182,9 @@ function goBack() {
             <p v-if="alreadyInGroup" class="already-message">
                 👍 Du bist bereits in der Gruppe <i>{{ groupName }}</i>.
             </p>
+            <p v-else-if="alreadySentInvite" class="already-message">
+                👍 Du hast bereits eine Beitritt-Anfrage an Gruppe <i>{{ groupName }}</i> geschickt.
+            </p>
 
             <div v-if="error" class="error-message">
                 {{ error }}
@@ -175,7 +196,7 @@ function goBack() {
                 </button>
 
                 <button
-                    v-if="!alreadyInGroup"
+                    v-if="!alreadyInGroup && !alreadySentInvite"
                     class="btn btn-primary"
                     @click="sendInvite"
                     :disabled="isLoading"
