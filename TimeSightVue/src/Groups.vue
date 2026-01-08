@@ -210,7 +210,7 @@ function changeShowGroupMngmt(group_id) {
                         <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
                         <div v-if="showGroupManagement[group.pk_group_id]" class="modal-overlay" @click.self="changeShowGroupMngmt(group.pk_group_id)">
                             <div class="modal-window">
-                                <GroupManagement :group="group" @close="changeShowGroupMngmt"/>
+                                <GroupManagement :group="group" @close="changeShowGroupMngmt(group.pk_group_id)"/>
                             </div>
                         </div>
                     </span>
