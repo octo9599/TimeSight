@@ -209,7 +209,9 @@ function changeShowGroupMngmt(group_id) {
                         <button @click="changeShowGroupMngmt(group.pk_group_id)">Gruppe Verwalten</button>
                         <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
                         <div v-if="showGroupManagement[group.pk_group_id]" class="modal-overlay" @click.self="changeShowGroupMngmt(group.pk_group_id)">
-                            <GroupManagement :group_id="group.pk_group_id" class="modal-window" @close="changeShowGroupMngmt"/>
+                            <div class="modal-window">
+                                <GroupManagement :group="group" @close="changeShowGroupMngmt"/>
+                            </div>
                         </div>
                     </span>
                 </div>
