@@ -172,7 +172,6 @@ function showCode(group_id) {
                 <div v-else class="no-members">
                     No members found
                 </div>
-                {{ inviteRequests }}
                 <ul v-if="inviteRequests[group.pk_group_id].length > 0" class="invite-reqs">
                     Invite Requests:
                     <li v-for="request of inviteRequests[group.pk_group_id]">
