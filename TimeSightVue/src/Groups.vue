@@ -40,10 +40,10 @@ async function fetchInviteRequests(group_id) {
         const output = [];
         for(const request of requests) {
             const user = (await axios.get(`${API}/user/${request.fk_user_id}`)).data[0];
-            output.push({ user_id: request.fk_user_id, username: user.username});
+            output.push({ anfrage_id: request.pk_anfrage_id, user_id: request.fk_user_id, group_id, username: user.username});
         }
         if(requests.length === 0) {
-            return [];
+            return null;
         }
         
         return output;
@@ -148,6 +148,30 @@ function showCode(group_id) {
 
 }
 
+async function answerInvite(request, is_accepted) {
+
+    try {
+
+        await axios.delete(`${API}/beitritt_anfrage/${request.anfrage_id}`);
+        if(is_accepted) {
+            await axios.post(`${API}/gruppe_user`, {
+                markierungsfarbe: null,
+                ist_admin: 0,
+                kann_bearbeiten: 0,
+                kann_loeschen: 0,
+                group_id: request.group_id,
+                user_id: request.user_id
+            });
+        }
+
+        await fetchGroups();
+
+    } catch(err) {
+        console.error("Error answering invite: ", err);
+    }
+
+}
+
 </script>
 
 <template>
@@ -172,10 +196,12 @@ function showCode(group_id) {
                 <div v-else class="no-members">
                     No members found
                 </div>
-                <ul v-if="inviteRequests[group.pk_group_id].length > 0" class="invite-reqs">
+                <ul v-if="inviteRequests[group.pk_group_id] != null" class="invite-reqs">
                     Invite Requests:
                     <li v-for="request of inviteRequests[group.pk_group_id]">
                         {{ request.username }} will beitreten
+                        <button @click="answerInvite(request, true)">Annehmen</button>
+                        <button @click="answerInvite(request, false)">Ablehnen</button>
                     </li>
                 </ul>
             </li>
