@@ -13,6 +13,7 @@ const isLoading = ref(false);
 
 const inviteCode = ref("");
 const showCodes = ref({});
+const inviteRequests = ref({});
 
 // Fetch groups data
 const fetchGroups = async () => {
@@ -21,12 +22,35 @@ const fetchGroups = async () => {
         const data = await fetchData();
         groups.value = data.groupsIn?.data || [];
         usersInGroup.value = data.groupUsers || {};
+        for(const group of groups.value) {
+            inviteRequests.value[group.pk_group_id] = await fetchInviteRequests(group.pk_group_id);
+        }
+        console.log(inviteRequests.value);
     } catch (error) {
         console.error('Error fetching groups:', error);
     } finally {
         isLoading.value = false;
     }
 };
+
+async function fetchInviteRequests(group_id) {
+
+    try {
+        const requests = (await axios.get(`${API}/gruppe/${group_id}/beitritt_anfrage`)).data;
+        const output = [];
+        for(const request of requests) {
+            const user = (await axios.get(`${API}/user/${request.fk_user_id}`)).data[0];
+            output.push({ user_id: request.fk_user_id, username: user.username});
+        }
+        if(requests.length === 0) {
+            return [];
+        }
+        
+        return output;
+    } catch (err) {
+        console.error('Error fetching invite-requests: ', err);
+    }
+}
 
 // Initial fetch
 onMounted(fetchGroups);
@@ -148,6 +172,13 @@ function showCode(group_id) {
                 <div v-else class="no-members">
                     No members found
                 </div>
+                {{ inviteRequests }}
+                <ul v-if="inviteRequests[group.pk_group_id].length > 0" class="invite-reqs">
+                    Invite Requests:
+                    <li v-for="request of inviteRequests[group.pk_group_id]">
+                        {{ request.username }} will beitreten
+                    </li>
+                </ul>
             </li>
         </ul>
         <p v-else class="no-groups">No groups found or loading...</p>
