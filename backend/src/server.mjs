@@ -440,6 +440,27 @@ app.post("/beitritt_anfrage", async (req, res) => {
     }
 });
 
+//Create a new ban
+app.post("/ban", async (req, res) => {
+    const {user_id, group_id} = req.body;
+
+    if (!user_id || !group_id) {
+        return res.status(400).json({error: "user_id and group_id are required to create a ban."});
+    }
+
+    try {
+        const result = await runQuery(
+            //Beitritt_Anfrage (pk_anfrage_id, fk_user_id, fk_group_id)
+            "INSERT INTO Ban VALUES (null, ?, ?)",
+            [user_id, group_id]
+        );
+
+        res.status(201).json({id: Number(result.insertId), fk_user_id: user_id, fk_group_id: group_id});
+    } catch {
+        res.status(500).json({error: "Failed to create ban"});
+    }
+});
+
 
 //DELETEs (remove Data)
 
