@@ -13,9 +13,11 @@
     const showBanUsername = ref(false);
     const showNameField = ref(false);
     const showBannedUsers = ref(false);
+    const showDeleteForm = ref(false);
 
     const newName = ref(null);
     const banUserName = ref(null);
+    const deleteGroupname = ref(null);
 
     const error = ref("");
 
@@ -192,6 +194,24 @@
 
     }
 
+    async function deleteGroup() {
+
+        try {
+            error.value = "";
+            if(deleteGroupname.value != props.group.gruppenname) {
+                throw new Error("Eingegebener Text nicht gleich wie Gruppenname");
+            }
+            await axios.delete(`${API}/gruppe/${props.group.pk_group_id}`);
+            showDeleteForm.value = false;
+            emit("close");
+
+        } catch (err) {
+            error.value = "Error deleting group: " + err;
+            console.error(error.value);
+        }
+
+    }
+
 </script>
 
 <template>
@@ -230,7 +250,19 @@
         </div>
     </div>
     <div>
+        <button @click="showDeleteForm = true" style="background-color: crimson;">Gruppe Löschen</button>
         <span style="color:crimson">{{ error }}</span>
+    </div>
+    <div class="modal-overlay" v-if="showDeleteForm" @click.self="showDeleteForm = false">
+        <div class="modal-window">
+            Geben Sie den Gruppennamen ein, zum zu Bestätigen, die Gruppe löschen zu wollen.
+            <span style="color:crimson">ACHTUNG: Diese Aktion löscht auch alle Termine dieser Gruppe.</span>
+            <form @submit.prevent="deleteGroup">
+                <input type="text" v-model="deleteGroupname" placeholder="Gruppenname" required/>
+                <button type="submit">Löschen</button>
+                <p style="color:crimson">{{ error }}</p>
+            </form>
+        </div>
     </div>
 </template>
 
