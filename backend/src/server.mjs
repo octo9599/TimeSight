@@ -507,6 +507,7 @@ app.delete("/gruppe/:group_id", async (req, res) => {
         await runQuery("DELETE FROM Termin WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
+        await runQuery("DELETE FROM Ban WHERE fk_group_id = ?", [group_id]);
 
         const result = await runQuery(
             "DELETE FROM Gruppe WHERE pk_group_id = ?",
