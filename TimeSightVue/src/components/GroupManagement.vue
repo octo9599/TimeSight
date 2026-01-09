@@ -8,6 +8,7 @@
 
     const users = ref([]);
     const bannedUsers = ref([]);
+    const admins = ref([]);
 
     const showBanUsername = ref(false);
     const showNameField = ref(false);
@@ -21,25 +22,41 @@
     const editChecks = ref({});
     const deleteChecks = ref({});
 
-    onMounted(fetchUsers);
+    onMounted(async () => {
+        await fetchUsers();
+        await fetchBannedUsers();
+    });
 
     async function fetchUsers() {
         try {
             //only allow managing users that arent admins (since optional goal of multiple admins wont be implemented)
             users.value = [];
+            admins.value = [];
             const temp_users = (await axios.get(`${API}/gruppe/${props.group.pk_group_id}/user`)).data;
             for(const user of temp_users) {
-                const user_perms = (await axios.get(`${API}/gruppe_user`, {
-                    params: { user_id: user.pk_user_id, group_id: props.group.pk_group_id }
-                })).data[0];
-                if(user_perms.ist_admin != 1) {
+                if(user.ist_admin != 1) {
                     users.value.push(user);
-                    editChecks.value[user.pk_user_id] = user_perms.kann_bearbeiten == 1;
-                    deleteChecks.value[user.pk_user_id] = user_perms.kann_loeschen == 1;
+                    editChecks.value[user.pk_user_id] = user.kann_bearbeiten == 1;
+                    deleteChecks.value[user.pk_user_id] = user.kann_loeschen == 1;
+                } else {
+                    admins.value.push(user);
                 }
             }
         } catch (err) {
             console.error("Error while fetching users of group:", err)
+        }
+    }
+
+    async function fetchBannedUsers() {
+        try {
+            bannedUsers.value = [];
+            const bans = (await axios.get(`${API}/gruppe/${props.group.pk_group_id}/ban`)).data;
+            for(const ban of bans) {
+                const user = (await axios.get(`${API}/user/${ban.fk_user_id}`)).data[0];
+                bannedUsers.value.push({...user, ban_id: ban.pk_ban_id});
+            }
+        } catch (err) {
+            console.error("Error while banning users: ", err);
         }
     }
 
@@ -56,6 +73,7 @@
 
     async function kickUser(user_id) {
         try {
+            error.value = "";
             await axios.delete(`${API}/gruppe_user`, {
                 params: { user_id: user_id, group_id: props.group.pk_group_id }
             });
@@ -68,7 +86,7 @@
 
     async function banUser(user_id) {
         try {
-
+            error.value = "";
             if(!user_id && banUserName.value && banUserName.value !== "") {
                 const user = (await axios.get(`${API}/user`, {
                     params: {username: banUserName.value}
@@ -81,13 +99,28 @@
                 user_id = user.pk_user_id;
             }
 
-            console.log(user_id);
+
+            if(await isAlreadyBanned(user_id)) {
+                throw new Error("User is already banned from this group.");
+            }
+
+            if(await isUserAdmin(user_id)) {
+                throw new Error("Admins can't be banned");
+            }
+
             if(await isInGroup(user_id)) {
                 await axios.delete(`${API}/gruppe_user`, {
                     params: { user_id: user_id, group_id: props.group.pk_group_id }
                 });
             }
+            
+            await axios.post(`${API}/ban`, {
+                user_id: user_id,
+                group_id: props.group.pk_group_id
+            });
+
             await fetchUsers();
+            await fetchBannedUsers();
         } catch (err) {
             error.value = "Error while banning user: " + err;
             console.error(error.value);
@@ -97,12 +130,33 @@
     async function isInGroup(user_id) {
         try {
             const user = (await axios.get(`${API}/user/${user_id}`)).data[0];
-            console.log(users.value.includes(user));
             return users.value.includes(user);
         } catch (err) {
             console.error("Error while checking if user is in Group: ", err);
         }
         
+    }
+
+    async function isAlreadyBanned(user_id) {
+
+            const ban = (await axios.get(`${API}/ban`, {
+                params: { user_id: user_id, group_id: props.group.pk_group_id }
+            })).data[0];
+
+            return !!ban;
+
+    }
+
+    async function isUserAdmin(user_id) {
+        try {
+            const user = (await axios.get(`${API}/user/${user_id}`)).data[0];;
+            let output = false;
+            admins.value.forEach((usr) => output = usr.pk_user_id == user.pk_user_id);
+            console.log(output);
+            return output;
+        } catch (err) {
+            console.error("Error while checking if user is admin: ", err);
+        }
     }
 
     async function updateUserPerms(user_id, isDeletePerm) {
@@ -124,9 +178,16 @@
 
     }
     
-    async function unbanUser(user_id) {
+    async function unbanUser(ban_id) {
 
-
+        try {
+            error.value = "";
+            await axios.delete(`${API}/ban/${ban_id}`);
+            await fetchBannedUsers();
+        } catch (err) {
+            error.value = "Error while unbanning user: " + err;
+            console.error(error.value);
+        }
 
     }
 
@@ -159,11 +220,11 @@
                 <p>Löschen <input type="checkbox" v-model="deleteChecks[user.pk_user_id]" @change="updateUserPerms(user.pk_user_id, true)" /></p>
             </p>
         </div>
-        <button @click="showBanUsername = !showBannedUsers">Gebannte User anzeigen</button>
+        <button @click="showBannedUsers = !showBannedUsers">Gebannte User anzeigen</button>
         <div v-if="showBannedUsers">
             <div v-for="user in bannedUsers">
                 {{  user.username }}
-                <button @click="unbanUser(user.pk_user_id)">Unban</button>
+                <button @click="unbanUser(user.ban_id)">Unban</button>
             </div>
         </div>
     </div>
