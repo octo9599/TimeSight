@@ -130,7 +130,9 @@
     async function isInGroup(user_id) {
         try {
             const user = (await axios.get(`${API}/user/${user_id}`)).data[0];
-            return users.value.includes(user);
+            let output = false;
+            users.value.forEach((usr) => output = usr.pk_user_id == user.pk_user_id);
+            return output;
         } catch (err) {
             console.error("Error while checking if user is in Group: ", err);
         }
@@ -152,7 +154,6 @@
             const user = (await axios.get(`${API}/user/${user_id}`)).data[0];;
             let output = false;
             admins.value.forEach((usr) => output = usr.pk_user_id == user.pk_user_id);
-            console.log(output);
             return output;
         } catch (err) {
             console.error("Error while checking if user is admin: ", err);
