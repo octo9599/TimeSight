@@ -274,7 +274,7 @@ app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
         const rows = await runQuery("SELECT * FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
         res.json(rows);
     } catch {
-        res.status(500).json({error: "Failed to fetch users"})
+        res.status(500).json({error: "Failed to fetch invite-requests"})
     }
 });
 
@@ -288,7 +288,21 @@ app.get("/ban", async (req, res) => {
         const rows = await runQuery("SELECT * FROM Ban WHERE fk_group_id = ? AND fk_user_id = ?", [group_id, user_id]);
         res.json(rows);
     } catch {
-        res.status(500).json({error: "Failed to fetch users"});
+        res.status(500).json({error: "Failed to fetch ban"});
+    }
+});
+
+//get all bans of a group
+app.get("/gruppe/:group_id/ban", async (req, res) => {
+    try {
+        const {group_id} = req.params;
+        if (!group_id) {
+            return res.status(400).json({error: "group_id is required for viewing bans of a group"});
+        }
+        const rows = await runQuery("SELECT * FROM Ban WHERE fk_group_id = ?", [group_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch bans"})
     }
 });
 
