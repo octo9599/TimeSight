@@ -476,6 +476,7 @@ app.delete("/user/:user_id", async (req, res) => {
         await runQuery("UPDATE Termin SET fk_ersteller_id = null WHERE fk_ersteller_id=?", [user_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_user_id = ?", [user_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_user_id = ?", [user_id]);
+        await runQuery("DELETE FROM Ban WHERE fk_user_id = ?", [user_id]);
 
         const result = await runQuery(
             "DELETE FROM User WHERE pk_user_id = ?",
