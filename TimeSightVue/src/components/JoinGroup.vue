@@ -21,6 +21,8 @@ const alreadyInGroup = ref(false);
 
 const alreadySentInvite = ref(false);
 
+const isBanned = ref(false);
+
 // Current user
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
@@ -48,6 +50,20 @@ async function checkIfGroupExists() {
         const group = res.data[0];
         groupId.value = group.pk_group_id;
         groupName.value = group.gruppenname;
+
+        //Check if user is banned from this group
+        try {
+            const bans = (await axios.get(`${API}/gruppe/${groupId.value}/ban`)).data;
+            for (const ban of bans) {
+                if(ban.fk_user_id == userId.value) {
+                    isBanned.value = true;
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error("Error while checking if user is banned:", err);
+            isBanned.value = false;
+        }
 
         // Check if user is already in the group
         try {
@@ -179,7 +195,10 @@ function goBack() {
                 <i>{{ groupName }}</i> zu senden.
             </p>
 
-            <p v-if="alreadyInGroup" class="already-message">
+            <p v-if="isBanned" style="color:crimson">
+                Du wurdest von der Gruppe <i>{{ groupName }}</i> gebannt.
+            </p>
+            <p v-else-if="alreadyInGroup" class="already-message">
                 👍 Du bist bereits in der Gruppe <i>{{ groupName }}</i>.
             </p>
             <p v-else-if="alreadySentInvite" class="already-message">
@@ -196,7 +215,7 @@ function goBack() {
                 </button>
 
                 <button
-                    v-if="!alreadyInGroup && !alreadySentInvite"
+                    v-if="!alreadyInGroup && !alreadySentInvite && !isBanned"
                     class="btn btn-primary"
                     @click="sendInvite"
                     :disabled="isLoading"
@@ -206,7 +225,7 @@ function goBack() {
                 </button>
 
                 <button
-                    v-if="alreadyInGroup"
+                    v-if="alreadyInGroup || alreadySentInvite || isBanned"
                     class="btn btn-primary"
                     @click="emit('close')"
                     :disabled="isLoading"
