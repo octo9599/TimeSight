@@ -190,8 +190,12 @@ async function answerInvite(request, is_accepted) {
 
 }
 
-function changeShowGroupMngmt(group_id) {
+async function changeShowGroupMngmt(group_id) {
     showGroupManagement.value[group_id] = !showGroupManagement.value[group_id];
+    if(!showGroupManagement.value[group_id]) {
+        console.log("fetching groups again");
+        await fetchGroups();
+    }
 }
 
 </script>
