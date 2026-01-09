@@ -599,6 +599,31 @@ app.delete("/termin/:termin_id", async (req, res) => {
     }
 });
 
+//Delete a Ban
+app.delete("/ban/:ban_id", async (req, res) => {
+    const {ban_id} = req.params;
+
+    try {
+        if (!ban_id) {
+            return res.status(400).json({error: "ban_id is required to delete a ban"});
+        }
+
+        const result = await runQuery(
+            "DELETE FROM Ban WHERE pk_ban_id = ?",
+            [ban_id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({error: "Ban not found"});
+        }
+
+        res.status(200).json({message: "Ban deleted successfully"});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error: "Failed to delete ban"});
+    }
+});
+
 
 //PATCHes (partially update data / UPDATE )
 
