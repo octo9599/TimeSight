@@ -278,6 +278,19 @@ app.get("/gruppe/:group_id/beitritt_anfrage", async (req, res) => {
     }
 });
 
+//get a ban by user_id and group_id
+app.get("/ban", async (req, res) => {
+    try {
+        const {user_id, group_id} = req.query;
+        if (!user_id || !group_id) {
+            return res.status(400).json({error: "user_id and group_id are required for viewing a ban"});
+        }
+        const rows = await runQuery("SELECT * FROM Ban WHERE fk_group_id = ? AND fk_user_id = ?", [group_id, user_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch users"});
+    }
+});
 
 //POSTs (create new Data/INSERTs)
 
