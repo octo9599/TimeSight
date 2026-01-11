@@ -41,25 +41,194 @@ async function createTermin() {
 </script>
 
 <template>
-    <form @submit.prevent="createTermin">
-        <h2>-- Termin Erstellen --</h2>
-        Bezeichnung: <input type="text" v-model="bezeichnung" placeholder="Familientreffen" required /> <br>
-        Beschreibung: <input type="text" v-model="beschreibung" placeholder="Treffen bei Oma" /> <br>
-        Datum: <input type="date" v-model="datum" placeholder="Batum" required /> <br>
-        Uhrzeit: <input type="time" v-model="uhrzeit" placeholder="Uhrzeit" /> <br>
-        für Gruppe:
-        <span v-if="groupsOfUser.length > 0">
-            <select v-model="groupSelect" required>
-                <option v-for="group in groupsOfUser" :value="group.pk_group_id">{{ group.gruppenname }}</option>
-            </select> <br>
-            <button type="submit">Erstellen</button>
-        </span>
-        <div v-else>
-            An keinen Gruppen teilnehmend! Bitte <router-link to="/groups" @click="emit('close')">Gruppe erstellen oder beitreten.</router-link>
+    <form class="termin-card" @submit.prevent="createTermin">
+        <h2 class="title">Termin erstellen</h2>
+
+        <div class="field">
+            <label>Bezeichnung</label>
+            <input
+                type="text"
+                v-model="bezeichnung"
+                placeholder="Familientreffen"
+                required
+            />
+        </div>
+
+        <div class="field">
+            <label>Beschreibung</label>
+            <input
+                type="text"
+                v-model="beschreibung"
+                placeholder="Treffen bei Oma"
+            />
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>Datum</label>
+                <input type="date" v-model="datum" required />
+            </div>
+
+            <div class="field">
+                <label>Uhrzeit</label>
+                <input type="time" v-model="uhrzeit" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label>Team</label>
+            <span v-if="groupsOfUser.length > 0">
+                <select v-model="groupSelect" required>
+                    <option
+                        v-for="group in groupsOfUser"
+                        :key="group.pk_group_id"
+                        :value="group.pk_group_id"
+                    >
+                        {{ group.gruppenname }}
+                    </option>
+                </select>
+            </span>
+
+            <span v-else class="hint">
+                An keinen Gruppen teilnehmend!
+                <router-link
+                    to="/groups"
+                    @click="emit('close')"
+                >
+                    Gruppe erstellen oder beitreten
+                </router-link>
+            </span>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="primary">
+                Erstellen
+            </button>
         </div>
     </form>
 </template>
 
-<style scoped>
 
+<style scoped>
+/* =========================
+   CARD
+========================= */
+
+.termin-card {
+    background: var(--main);
+    border-radius: 18px;
+    padding: 28px;
+    width: min(480px, 92vw);
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    border: 7px solid var(--field);
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.title {
+    margin: 0 0 10px 0;
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--text);
+}
+
+/* =========================
+   FIELDS
+========================= */
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    color: var(--text);
+}
+
+.field input,
+.field select {
+    padding: 12px 14px;
+    border-radius: 10px;
+
+    background: var(--field);
+    border: 2px solid var(--field);
+
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* =========================
+   ROW (DATE + TIME)
+========================= */
+
+.row {
+    display: flex;
+    gap: 14px;
+}
+
+.row .field {
+    flex: 1;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.primary {
+    background: var(--today);
+    color: white;
+
+    border: none;
+    border-radius: 12px;
+
+    padding: 12px 28px;
+    font-size: 1rem;
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+}
+
+.primary:hover {
+    opacity: 0.9;
+}
+
+/* =========================
+   HINT / EMPTY STATE
+========================= */
+
+.hint {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.hint a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.hint a:hover {
+    text-decoration: underline;
+}
 </style>

@@ -263,123 +263,223 @@ async function changeShowGroupMngmt(group_id) {
 <style scoped>
 h1, h2, h3 {
     letter-spacing: 1px;
+    color: var(--text);
 }
 
 .groups-container {
-    padding: 20px;
-    max-width: 800px;
+    padding: 24px;
+    max-width: 900px;
     margin: 0 auto;
     min-height: 60vh;
-}
 
-.create-group-btn, .join-group-btn {
-    display: block;
-    width: 100%;
-    padding: 12px 20px;
-    margin-top: 20px;
-    background: var(--accent);
-    color: white;
-    border: var(--text) solid 2px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.create-group-btn:hover:not(:disabled), .join-group-btn:hover:not(:disabled) {
-    background: var(--accent);
-}
-
-.create-group-btn:disabled, .join-group-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .groups-list {
     list-style: none;
     padding: 0;
+    margin: 0;
+    width: 100%;
+
     display: flex;
     flex-direction: column;
-    gap: 1.5em;
+    gap: 2rem;
 }
 
 .group-item {
-    background-color: var(--main);
-    border: 5px solid var(--field);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px;
+
+    background: var(--main);
+
+    border: 7px solid var(--field);
+    border-radius: 16px;
+
+    padding: 0;
+    overflow: hidden;
+
+    position: relative;
+    box-shadow: none;
 }
 
 .group-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 20px;
+    background: var(--field);
+
+    border-bottom: 2px solid var(--field);
+}
+
+.group-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* Header action buttons */
+
+.group-header button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.85rem;
+    margin-left: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.group-header button:hover {
+    text-decoration: underline;
+}
+
+.group-header > span > div {
+    position: absolute;
+    left: 50%;
+    top: 56px;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: monospace;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+
+    color: var(--accent);
+    background: var(--main);
+
+    padding: 10px 18px;
+    border-radius: 12px;
+
+    border: 2px solid var(--field);
+    box-shadow: none;
+}
+
+/* Header extra space when invite code is visible */
+.group-header:has(> span > div) {
+    padding-bottom: 56px;
 }
 
 .members-list {
-    margin-top: 10px;
-    padding-left: 20px;
+    padding: 18px 20px;
 }
 
-.member-item {
-    padding: 5px 0;
-    list-style-type: disc;
+.members-list h3 {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-bottom: 6px;
 }
+
+.member-names {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.invite-reqs {
+    list-style: none;
+    padding: 14px 20px;
+    margin: 0;
+
+    border-top: 2px solid var(--field);
+    font-size: 0.9rem;
+}
+
+.invite-reqs li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.invite-reqs button {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.invite-reqs button:first-of-type {
+    color: #4ade80;
+}
+
+.invite-reqs button:last-of-type {
+    color: #ef4444;
+}
+
+.invite-reqs button:hover {
+    text-decoration: underline;
+}
+
 
 .no-members,
 .no-groups {
     color: var(--text);
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    margin-top: 2rem;
 }
 
-h2 {
-    color: var(--text);
-    margin: 0 auto;
-    text-align: center;
-}
+.create-group-btn,
+.join-group-btn {
+    width: 100%;
+    max-width: 900px;
 
-h3 {
+    padding: 16px;
+    margin-top: 20px;
+
+    background: var(--field);
     color: var(--text);
-    margin: 10px 0 5px 0;
+
+    border: 2px solid var(--field);
+    border-radius: 14px;
+
     font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    transition: background 0.15s ease;
 }
 
-.member-names {
-    color: var(--text);
-    font-size: 0.9em;
-    line-height: 1.4;
+.create-group-btn:hover,
+.join-group-btn:hover {
+    background: var(--accent);
 }
 
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
 
+    background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
 
     z-index: 1000;
 }
 
 .modal-window {
     background: var(--main);
-    border-radius: 12px;
+    border-radius: 16px;
+
     width: min(600px, 90vw);
     max-height: 85vh;
     overflow-y: auto;
 
     padding: 1.5rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 
-    animation: modalIn 0.2s ease-out;
+    border: 2px solid var(--field);
+    box-shadow: none;
 }
 </style>
