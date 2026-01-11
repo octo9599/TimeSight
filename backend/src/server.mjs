@@ -61,10 +61,24 @@ app.get("/termin/:termin_id", async (req, res) => {
         if (!termin_id) {
             return res.status(400).json({error: "termin_id is required for viewing a task"});
         }
-        const rows = await runQuery("SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE pk_termin_id = ?", [termin_id]);
+        const rows = await runQuery("SELECT * FROM Termin WHERE pk_termin_id = ?", [termin_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch tasks"});
+    }
+});
+
+//Get a termin_user entry through user_id and termin_id
+app.get("/termin_user", async (req, res) => {
+    try {
+        const {termin_id, user_id} = req.query;
+        if (!termin_id || !user_id) {
+            return res.status(400).json({error: "termin_id is required for viewing a task"});
+        }
+        const rows = await runQuery("SELECT * FROM Termin_User WHERE fk_termin_id = ? AND fk_user_id = ?", [termin_id, user_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch termin_user"});
     }
 });
 
@@ -74,12 +88,12 @@ app.get("/termin/:termin_id", async (req, res) => {
 app.get("/gruppe/:group_id/termin", async (req, res) => {
     try {
         const {group_id} = req.params;
-        const {datum, is_past_due, ist_erledigt} = req.query;
-        if (!group_id) {
-            return res.status(400).json({error: "group_id is required for viewing tasks of a group"});
+        const {datum, is_past_due, ist_erledigt, user_id} = req.query;
+        if (!group_id || !user_id) {
+            return res.status(400).json({error: "group_id and user_id are required for viewing tasks of a group"});
         }
-        let sql = "SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE t.fk_group_id = ?";
-        const params = [group_id];
+        let sql = "SELECT t.*, tu.ist_erledigt, tu.fk_user_id FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE t.fk_group_id = ? AND tu.fk_user_id = ?";
+        const params = [group_id, user_id];
 
         if (is_past_due == 1) {
             sql += " AND tu.ist_erledigt = false AND t.datum < CURDATE()";
