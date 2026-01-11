@@ -4,6 +4,7 @@
     import { fetchData, API } from "./DataAccess.mjs";
 
     const termin = ref({});
+    const termin_user = ref({});
     const id = ref(0);
     const bezeichnung = ref("");
     const beschreibung = ref("");
@@ -29,6 +30,8 @@
 
     async function init_termin(termin_id) {
         try {
+
+            const data = await fetchData();
             id.value = termin_id;
 
             if(id.value == 0) {
@@ -36,6 +39,7 @@
             }
 
             termin.value = (await axios.get(`${API}/termin/${id.value}`)).data[0];
+            termin_user.value = (await axios.get(`${API}/termin_user`, {params: {termin_id: id.value, user_id: data.user.pk_user_id}})).data[0];
 
             bezeichnung.value = termin.value.bezeichnung;
             beschreibung.value = termin.value.beschreibung;
@@ -43,7 +47,7 @@
             gruppenname.value = (await axios.get(`${API}/gruppe/${termin.value.fk_group_id}`)).data[0].gruppenname;
             erstellername.value = (await axios.get(`${API}/user/${termin.value.fk_ersteller_id}`)).data[0].username;
 
-            is_checked.value = termin.value.ist_erledigt === 1;
+            is_checked.value = termin_user.value.ist_erledigt === 1;
 
             newName.value = bezeichnung.value;
             newDesc.value = beschreibung.value;
@@ -116,10 +120,11 @@
     async function change_erledigt() {
 
         try {
+            const data = await fetchData();
             is_changed = true;
-            console.log((await axios.patch(`${API}/termin/${id.value}`, {
-                ist_erledigt: is_checked.value
-            })).data);
+            await axios.patch(`${API}/termin_user/`, {ist_erledigt: is_checked.value}, 
+			    {params: {termin_id: id.value, user_id: data.user.pk_user_id}}
+		    );
 
         } catch (err) {
             console.log(err);

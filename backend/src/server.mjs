@@ -68,32 +68,46 @@ app.get("/termin/:termin_id", async (req, res) => {
     }
 });
 
+//Get a termin_user entry through user_id and termin_id
+app.get("/termin_user", async (req, res) => {
+    try {
+        const {termin_id, user_id} = req.query;
+        if (!termin_id || !user_id) {
+            return res.status(400).json({error: "termin_id is required for viewing a task"});
+        }
+        const rows = await runQuery("SELECT * FROM Termin_User WHERE fk_termin_id = ? AND fk_user_id = ?", [termin_id, user_id]);
+        res.json(rows);
+    } catch {
+        res.status(500).json({error: "Failed to fetch termin_user"});
+    }
+});
+
 //Get tasks of a group. Has the option to list tasks of a specific date. 
 //Lists completed tasks if 'ist_erledigt=1' is in query, otherwise only lists uncompleted tasks.
 //Only lists uncompleted past due exams if 'is_past_due=1' is in query.
 app.get("/gruppe/:group_id/termin", async (req, res) => {
     try {
         const {group_id} = req.params;
-        const {datum, is_past_due, ist_erledigt} = req.query;
-        if (!group_id) {
-            return res.status(400).json({error: "group_id is required for viewing tasks of a group"});
+        const {datum, is_past_due, ist_erledigt, user_id} = req.query;
+        if (!group_id || !user_id) {
+            return res.status(400).json({error: "group_id and user_id are required for viewing tasks of a group"});
         }
-        let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
-        const params = [group_id];
+        let sql = "SELECT t.*, tu.ist_erledigt, tu.fk_user_id FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE t.fk_group_id = ? AND tu.fk_user_id = ?";
+        const params = [group_id, user_id];
 
         if (is_past_due == 1) {
-            sql += " AND ist_erledigt = false AND datum < CURDATE()";
+            sql += " AND tu.ist_erledigt = false AND t.datum < CURDATE()";
         } else if (ist_erledigt == 1) {
-            sql += " AND ist_erledigt = true";
+            sql += " AND tu.ist_erledigt = true";
         } else {
-            sql += " AND datum >= CURDATE() AND ist_erledigt = false";
+            sql += " AND t.datum >= CURDATE() AND tu.ist_erledigt = false";
         }
 
         if (datum) {
-            sql += " AND datum = ?";
+            sql += " AND t.datum = ?";
             params.push(datum);
         }
-        sql += " ORDER BY datum, bezeichnung";
+        sql += " ORDER BY t.datum, t.bezeichnung";
 
         const rows = await runQuery(sql, params);
         res.json(rows);
@@ -324,8 +338,8 @@ app.post("/termin", async (req, res) => {
     try {
         let date_time = `${datum} ${uhrzeit}:00`;
         const result = await runQuery(
-            //Termin (pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
-            "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
+            //Termin (pk_termin, bezeichnung, beschreibung, datum, fk_group_id, fk_ersteller_id)
+            "INSERT INTO Termin VALUES (null, ?, ?, ?, ?, ?)",
             [bezeichnung, desc, date_time, group_id, user_id]
         );
 
@@ -339,6 +353,31 @@ app.post("/termin", async (req, res) => {
         });
     } catch {
         res.status(500).json({error: "Failed to create task"});
+    }
+});
+
+app.post("/termin_user", async (req, res) => {
+    const {termin_id, user_id} = req.body;
+
+    if (!termin_id || !user_id) {
+        return res.status(400).json({error: "termin_id and user_id are required to create a termin_user entry"});
+    }
+
+    try {
+        let date_time = `${datum} ${uhrzeit}:00`;
+        const result = await runQuery(
+            //Termin (ist_erledigt, fk_termin_id, fk_user_id)
+            "INSERT INTO Termin_User VALUES (FALSE, ?, ?)",
+            [termin_id, user_id]
+        );
+
+        res.status(201).json({
+            id: Number(result.insertId),
+            termin_id,
+            user_id
+        });
+    } catch {
+        res.status(500).json({error: "Failed to create termin_user entry"});
     }
 });
 
@@ -505,7 +544,7 @@ app.delete("/gruppe/:group_id", async (req, res) => {
             return res.status(400).json({error: "group_id is required to delete a group"});
         }
 
-        await runQuery("DELETE FROM Termin WHERE fk_group_id = ?", [group_id]);
+        await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Ban WHERE fk_group_id = ?", [group_id]);
@@ -584,6 +623,8 @@ app.delete("/termin/:termin_id", async (req, res) => {
         if (!termin_id) {
             return res.status(400).json({error: "termin_id is required to delete a task"});
         }
+
+        await runQuery("DELETE FROM Termin_User WHERE fk_termin_id = ?", [termin_id]);
 
         const result = await runQuery(
             "DELETE FROM Termin WHERE pk_termin_id = ?",
@@ -750,6 +791,36 @@ app.patch("/termin/:termin_id", async (req, res) => {
 
     try {
         const result = await runQuery(sql, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({error: "Task not found"});
+        }
+
+        res.json({message: "Task updated successfully"});
+    } catch (err) {
+        console.error("PATCH ERROR:", err);
+        res.status(500).json({error: "Failed to update Task"});
+    }
+});
+
+//update ist_erledigt of termin_user
+app.patch("/termin_user", async (req, res) => {
+    const {termin_id, user_id} = req.query;
+    const {ist_erledigt} = req.body;
+
+    if(!termin_id || !user_id) {
+        return res.status(400).json({error: "termin_id and user_id required for patching a termin_user entry"});
+    }
+
+    if (ist_erledigt === undefined) {
+        return res.status(400).json({error: "No fields provided for update"});
+    }
+
+    try {
+        const result = await runQuery(`
+            UPDATE Termin_User
+            SET ist_erledigt = ?
+            WHERE fk_termin_id = ? AND fk_user_id = ? `, [ist_erledigt, termin_id, user_id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({error: "Task not found"});

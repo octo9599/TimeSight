@@ -17,10 +17,10 @@ export async function fetchData() {
 
 		for (const group of groups) {
 			const [toDoIn, overIn, doneIn, usersIn] = await Promise.all([
-				axios.get(`${API}/gruppe/${group}/termin`),
-				axios.get(`${API}/gruppe/${group}/termin`, {params: {is_past_due: 1}}),
-				axios.get(`${API}/gruppe/${group}/termin`, {params: {ist_erledigt: 1}}),
-				axios.get(`${API}/gruppe/${group}/user`)
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {user_id: userStore.user.pk_user_id}}),
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {is_past_due: 1, user_id: userStore.user.pk_user_id}}),
+				axios.get(`${API}/gruppe/${group}/termin`, {params: {ist_erledigt: 1, user_id: userStore.user.pk_user_id}}),
+				axios.get(`${API}/gruppe/${group}/user`, {params: {user_id: userStore.user.pk_user_id}})
 			]);
 
 			toDoTermine.push(...toDoIn.data);
