@@ -78,7 +78,7 @@ app.get("/gruppe/:group_id/termin", async (req, res) => {
         if (!group_id) {
             return res.status(400).json({error: "group_id is required for viewing tasks of a group"});
         }
-        let sql = "SELECT * FROM Termin WHERE fk_group_id = ?";
+        let sql = "SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE fk_group_id = ?";
         const params = [group_id];
 
         if (is_past_due == 1) {
