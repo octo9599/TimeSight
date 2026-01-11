@@ -50,9 +50,9 @@ async function viewTermin(id) {
 
 async function change_erledigt(event, id) {
 	try {
-		await axios.patch(`${API}/termin/${id}`, {
-			ist_erledigt: event.target.checked
-		});
+		await axios.patch(`${API}/termin_user/`, {ist_erledigt: event.target.checked}, 
+			{params: {termin_id: id, user_id: userStore.user.pk_user_id}}
+		);
 	} catch (err) {
 		console.log(err);
 	}
