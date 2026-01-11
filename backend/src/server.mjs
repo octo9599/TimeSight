@@ -789,6 +789,36 @@ app.patch("/termin/:termin_id", async (req, res) => {
     }
 });
 
+//update ist_erledigt of termin_user
+app.patch("/termin_user", async (req, res) => {
+    const {termin_id, user_id} = req.query;
+    const {ist_erledigt} = req.body;
+
+    if(!termin_id || !user_id) {
+        return res.status(400).json({error: "termin_id and user_id required for patching a termin_user entry"});
+    }
+
+    if (ist_erledigt === undefined) {
+        return res.status(400).json({error: "No fields provided for update"});
+    }
+
+    try {
+        const result = await runQuery(`
+            UPDATE Termin
+            SET ist_erledigt = ?
+            WHERE fk_termin_id = ? AND fk_user_id = ? `, [ist_erledigt, termin_id, user_id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({error: "Task not found"});
+        }
+
+        res.json({message: "Task updated successfully"});
+    } catch (err) {
+        console.error("PATCH ERROR:", err);
+        res.status(500).json({error: "Failed to update Task"});
+    }
+});
+
 //partially update a users group-rights or their chosen group-colour
 app.patch("/gruppe_user", async (req, res) => {
     const {group_id, user_id} = req.query;
