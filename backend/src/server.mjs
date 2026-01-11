@@ -342,6 +342,31 @@ app.post("/termin", async (req, res) => {
     }
 });
 
+app.post("/termin_user", async (req, res) => {
+    const {termin_id, user_id} = req.body;
+
+    if (!termin_id || !user_id) {
+        return res.status(400).json({error: "termin_id and user_id are required to create a termin_user entry"});
+    }
+
+    try {
+        let date_time = `${datum} ${uhrzeit}:00`;
+        const result = await runQuery(
+            //Termin (ist_erledigt, fk_termin_id, fk_user_id)
+            "INSERT INTO Termin_User VALUES (FALSE, ?, ?)",
+            [termin_id, user_id]
+        );
+
+        res.status(201).json({
+            id: Number(result.insertId),
+            termin_id,
+            user_id
+        });
+    } catch {
+        res.status(500).json({error: "Failed to create termin_user entry"});
+    }
+});
+
 //Create a new Group
 app.post("/gruppe", async (req, res) => {
     const {gruppenname, invite_code} = req.body;
