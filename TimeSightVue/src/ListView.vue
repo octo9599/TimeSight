@@ -49,18 +49,14 @@ async function viewTermin(id) {
 }
 
 async function change_erledigt(event, id) {
-
 	try {
-		console.log((await axios.patch(`${API}/termin/${id}`, {
+		await axios.patch(`${API}/termin/${id}`, {
 			ist_erledigt: event.target.checked
-		})).data);
-
+		});
 	} catch (err) {
 		console.log(err);
 	}
-
 	loadTermine();
-
 }
 
 function closeTermin(is_changed) {
@@ -79,19 +75,18 @@ async function loadTermine() {
 	dates.value = data.dates;
 }
 
-
 watch(
 	() => loadTaskStore.shouldLoad,
 	(newVal) => {
 		if (newVal === true) {
 			loadTermine();
-			loadTaskStore.shouldLoad = false
+			loadTaskStore.shouldLoad = false;
 		}
 	},
 	{ immediate: true }
 );
 
-onMounted(async () => {
+onMounted(() => {
 	loadTermine();
 });
 </script>
@@ -123,8 +118,11 @@ onMounted(async () => {
 					<a href="#" class="termin" @click.prevent="viewTermin(termin.pk_termin_id)">
 						<h3>{{ termin.bezeichnung }}</h3>
 					</a>
-					<input type="checkbox" :checked="termin.ist_erledigt === 1"
-						@change="change_erledigt($event, termin.pk_termin_id)" />
+					<input
+						type="checkbox"
+						:checked="termin.ist_erledigt === 1"
+						@change="change_erledigt($event, termin.pk_termin_id)"
+					/>
 				</dd>
 			</template>
 		</template>
@@ -137,26 +135,57 @@ onMounted(async () => {
 
 <style scoped>
 * {
-	/* font-family: JockeyOne; */
-	/* src: url('@/assets/fonts/JockeyOne-Regular.ttf'); */
 	color: var(--text);
 }
 
 h2 {
-	margin: 0px;
+	margin: 0;
 }
 
 h3 {
-	margin: 0%;
+	margin: 0;
 	padding: 1rem;
+}
+
+#navbar {
+	display: flex;
+	gap: 2.5rem;
+	margin: 1.5rem 0 1rem 3%;
+	width: auto;
+}
+
+#navbar button.astext {
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+}
+
+#navbar h2 {
+	font-size: 1.2rem;
+	font-weight: 600;
+	opacity: 0.7;
+	transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+#navbar button.astext:hover h2 {
+	opacity: 1;
+}
+
+#navbar button.active h2 {
+	opacity: 1;
+	text-decoration: underline;
+	text-decoration-color: var(--accent);
+	text-decoration-thickness: 2px;
+	text-underline-offset: 6px;
 }
 
 dt {
 	margin-left: 1%;
 }
 
-dd,
-button {
+dd {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -165,57 +194,19 @@ button {
 	background-color: var(--field);
 }
 
-ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-}
-
-li {
-	float: left;
-
-}
-
-.astext {
-	background: none;
-	border: none;
-	margin: 1rem 1.5rem 1rem 1.5rem;
-	padding: 0;
-	cursor: pointer;
-}
-
-.active {
-	text-decoration: underline;
-	text-decoration-color: var(--accent);
-	text-decoration-thickness: 2px;
-}
-
 .termin {
 	text-decoration: none;
 }
 
-#navbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 35%;
-}
-
-
-/* TaskView Window */
 .modal-overlay {
 	position: fixed;
 	inset: 0;
 	background: rgba(0, 0, 0, 0.35);
-
 	backdrop-filter: blur(6px);
 	-webkit-backdrop-filter: blur(6px);
-
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
 	z-index: 1000;
 }
 
@@ -225,29 +216,61 @@ li {
 	width: min(600px, 90vw);
 	max-height: 85vh;
 	overflow-y: auto;
-
 	padding: 1.5rem;
 	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
 
-	animation: modalIn 0.2s ease-out;
+  width: 28px;
+  height: 28px;
+
+  border: 3px solid var(--text);
+  border-radius: 6px;
+
+  background: transparent;
+  cursor: pointer;
+
+  position: relative; /* wichtig */
 }
 
 input[type="checkbox"] {
-	/* ...existing styles */
-	display: grid;
-	place-content: center;
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 28px;
+  height: 28px;
+
+  border: 3px solid var(--text);
+  border-radius: 6px;
+
+  background: transparent;
+  cursor: pointer;
+
+  position: relative; /* wichtig */
 }
 
+/* inner green square */
 input[type="checkbox"]::before {
-	content: "";
-	width: 1em;
-	height: 1em;
-	transform: scale(0);
-	transition: 120ms transform ease-in-out;
-	box-shadow: inset 1em 1em var(--done);
+  content: "";
+  width: 16px;
+  height: 16px;
+
+  background-color: var(--done);
+  border-radius: 3px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+
+  transition: transform 0.12s ease-in-out;
 }
 
+/* checked state */
 input[type="checkbox"]:checked::before {
-	transform: scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
+
 </style>
