@@ -182,6 +182,10 @@ async function answerInvite(request, is_accepted) {
             });
         }
 
+        if(is_accepted) {
+            await axios.post(`${API}/gruppe/${request.group_id}/termin_user`, {user_id: request.user_id});
+        }
+
         await fetchGroups();
 
     } catch(err) {
