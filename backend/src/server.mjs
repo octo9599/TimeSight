@@ -818,7 +818,7 @@ app.patch("/termin_user", async (req, res) => {
 
     try {
         const result = await runQuery(`
-            UPDATE Termin
+            UPDATE Termin_User
             SET ist_erledigt = ?
             WHERE fk_termin_id = ? AND fk_user_id = ? `, [ist_erledigt, termin_id, user_id]);
 
