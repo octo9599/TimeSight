@@ -23,10 +23,7 @@ onMounted(async () => {
 
 async function createTermin() {
 
-    console.log(datum.value);
-    console.log(uhrzeit.value);
-
-    await axios.post(`${API}/termin`, {
+    const termin = await axios.post(`${API}/termin`, {
         bezeichnung: bezeichnung.value,
         beschreibung: beschreibung.value,
         datum: datum.value,
@@ -34,6 +31,13 @@ async function createTermin() {
         group_id: groupSelect.value,
         user_id: data.user.pk_user_id
     });
+
+    const users = (await axios.get(`${API}/gruppe/${groupSelect.value}/user`)).data;
+
+    console.log(termin.data.id)
+    for(const user of users) {
+        await axios.post(`${API}/termin_user`, {termin_id: termin.data.id, user_id: user.pk_user_id});
+    }
 
     emit('close');
 
