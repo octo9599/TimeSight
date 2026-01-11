@@ -61,7 +61,7 @@ app.get("/termin/:termin_id", async (req, res) => {
         if (!termin_id) {
             return res.status(400).json({error: "termin_id is required for viewing a task"});
         }
-        const rows = await runQuery("SELECT * FROM Termin WHERE pk_termin_id = ?", [termin_id]);
+        const rows = await runQuery("SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE pk_termin_id = ?", [termin_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch tasks"});
@@ -78,22 +78,22 @@ app.get("/gruppe/:group_id/termin", async (req, res) => {
         if (!group_id) {
             return res.status(400).json({error: "group_id is required for viewing tasks of a group"});
         }
-        let sql = "SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE fk_group_id = ?";
+        let sql = "SELECT t.*, tu.ist_erledigt FROM Termin t INNER JOIN Termin_User tu ON t.pk_termin_id = tu.fk_termin_id WHERE t.fk_group_id = ?";
         const params = [group_id];
 
         if (is_past_due == 1) {
-            sql += " AND ist_erledigt = false AND datum < CURDATE()";
+            sql += " AND tu.ist_erledigt = false AND t.datum < CURDATE()";
         } else if (ist_erledigt == 1) {
-            sql += " AND ist_erledigt = true";
+            sql += " AND tu.ist_erledigt = true";
         } else {
-            sql += " AND datum >= CURDATE() AND ist_erledigt = false";
+            sql += " AND t.datum >= CURDATE() AND tu.ist_erledigt = false";
         }
 
         if (datum) {
-            sql += " AND datum = ?";
+            sql += " AND t.datum = ?";
             params.push(datum);
         }
-        sql += " ORDER BY datum, bezeichnung";
+        sql += " ORDER BY t.datum, t.bezeichnung";
 
         const rows = await runQuery(sql, params);
         res.json(rows);
