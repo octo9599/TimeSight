@@ -364,7 +364,6 @@ app.post("/termin_user", async (req, res) => {
     }
 
     try {
-        let date_time = `${datum} ${uhrzeit}:00`;
         const result = await runQuery(
             //Termin (ist_erledigt, fk_termin_id, fk_user_id)
             "INSERT INTO Termin_User VALUES (FALSE, ?, ?)",
@@ -374,6 +373,36 @@ app.post("/termin_user", async (req, res) => {
         res.status(201).json({
             id: Number(result.insertId),
             termin_id,
+            user_id
+        });
+    } catch {
+        res.status(500).json({error: "Failed to create termin_user entry"});
+    }
+});
+
+app.post("/gruppe/:group_id/termin_user", async (req, res) => {
+    const {user_id} = req.body;
+    const {group_id} = req.params;
+
+    if (!group_id || !user_id) {
+        return res.status(400).json({error: "termin_id and user_id are required to create a termin_user entry"});
+    }
+
+    try {
+
+        const termine = await runQuery("SELECT * FROM Termin WHERE fk_group_id = ? AND datum >= CURDATE()", [group_id]);
+
+        for(const termin of termine) {
+            const result = await runQuery(
+                //Termin (ist_erledigt, fk_termin_id, fk_user_id)
+                "INSERT INTO Termin_User VALUES (FALSE, ?, ?)",
+                [termin.pk_termin_id, user_id]
+            );
+        }
+
+        res.status(201).json({
+            message: "Termin_User for every task of a group inserted succesfully.",
+            group_id,
             user_id
         });
     } catch {
@@ -512,6 +541,7 @@ app.delete("/user/:user_id", async (req, res) => {
             return res.status(400).json({error: "user_id is required to delete a user"});
         }
 
+        await runQuery("DELETE tu FROM Termin_User WHERE fk_user_id = ?", [user_id]);
         await runQuery("UPDATE Termin SET fk_ersteller_id = null WHERE fk_ersteller_id=?", [user_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_user_id = ?", [user_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_user_id = ?", [user_id]);
@@ -573,6 +603,9 @@ app.delete("/gruppe_user", async (req, res) => {
         if (!user_id || !group_id) {
             return res.status(400).json({error: "user_id and group_id are required to remove a user from a group"});
         }
+
+        await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ? AND tu.fk_user_id = ?", 
+        [group_id, user_id]);
 
         const result = await runQuery(
             "DELETE FROM Gruppe_User WHERE fk_user_id = ? AND fk_group_id = ?",
