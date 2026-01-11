@@ -139,7 +139,7 @@ onMounted(async () => {
 * {
 	/* font-family: JockeyOne; */
 	/* src: url('@/assets/fonts/JockeyOne-Regular.ttf'); */
-	color: var(--text-dark);
+	color: var(--text);
 }
 
 h2 {
@@ -162,7 +162,7 @@ button {
 	align-items: center;
 	margin: 1% 20% 1% 3%;
 	border-radius: 1rem;
-	background-color: var(--field-dark);
+	background-color: var(--field);
 }
 
 ul {
@@ -187,7 +187,7 @@ li {
 
 .active {
 	text-decoration: underline;
-	text-decoration-color: var(--accent-dark);
+	text-decoration-color: var(--accent);
 	text-decoration-thickness: 2px;
 }
 
@@ -220,7 +220,7 @@ li {
 }
 
 .modal-window {
-	background: var(--main-dark);
+	background: var(--main);
 	border-radius: 12px;
 	width: min(600px, 90vw);
 	max-height: 85vh;
@@ -244,7 +244,7 @@ input[type="checkbox"]::before {
 	height: 1em;
 	transform: scale(0);
 	transition: 120ms transform ease-in-out;
-	box-shadow: inset 1em 1em var(--done-dark);
+	box-shadow: inset 1em 1em var(--done);
 }
 
 input[type="checkbox"]:checked::before {

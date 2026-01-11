@@ -1,8 +1,18 @@
 <script setup>
-
-	const props = defineProps({showAcc: Boolean});
+	const props = defineProps({
+		showAcc: Boolean,
+		darkMode: Boolean
+	});
 	const emit = defineEmits(['showPopup']);
 
+	import { computed } from 'vue';
+
+	import AccDark from '@/assets/images/TEMPORARY-Account-Icon-Dark.png';
+	import AccLight from '@/assets/images/TEMPORARY-Account-Icon-Light.png';
+
+	const accIconSrc = computed(() =>
+		props.darkMode ? AccDark : AccLight
+	);
 </script>
 
 <template>
@@ -22,7 +32,12 @@
 		<!-- actual account icon will go here once available -->
 		<section v-if="showAcc" id="account-icon-container" class="topbar-icon-containers">
 			<a href="#" @click.prevent="emit('showPopup')">
-				<img id="acc-icon" alt="Account Menu" class="icons" src="@/assets/images/TEMPORARY-Account-Icon.png">
+				<img
+					id="acc-icon"
+					alt="Account Menu"
+					class="icons"
+					:src="accIconSrc"
+				>
 			</a>
 		</section>
 	</div>
@@ -31,14 +46,14 @@
 <style scoped>
 h1 {
 	font-family: JockeyOne, serif;
-	color: var(--text-dark);
+	color: var(--text);
 	font-size: 94px;
 	letter-spacing: 3px;
 	margin: 0 auto;
 }
 
 span.highlighted {
-	color: var(--accent-dark);
+	color: var(--accent);
 }
 
 #topbar-container {
@@ -46,8 +61,8 @@ span.highlighted {
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	background-color: var(--main-dark);
-	border-bottom: 3px var(--text-dark) solid;
+	background-color: var(--main);
+	border-bottom: 3px var(--text) solid;
 	height: 16vh;
 }
 
@@ -64,7 +79,6 @@ section.topbar-icon-containers {
 	width: 11%;
 	height: 100%;
 }
-
 
 a, #account-icon-container {
 	display: flex;

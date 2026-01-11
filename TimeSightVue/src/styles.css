@@ -12,6 +12,24 @@
 	--today-light: #3256AB;
 	--today-dark: #3256A8;
 }
+:root {
+  --text: var(--text-light);
+  --main: var(--main-light);
+  --field: var(--field-light);
+  --accent: var(--accent-light);
+  --done: var(--done-light);
+  --today: var(--today-light);
+}
+
+.dark {
+  --text: var(--text-dark);
+  --main: var(--main-dark);
+  --field: var(--field-dark);
+  --accent: var(--accent-dark);
+  --done: var(--done-dark);
+  --today: var(--today-dark);
+}
+
 
 * {
 	box-sizing: border-box;

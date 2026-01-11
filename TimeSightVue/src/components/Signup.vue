@@ -99,12 +99,12 @@ br{ display:none; }
   width: min(520px, 92vw);
   padding: 26px;
 
-  background: var(--main-dark);
-  border: 6px solid var(--field-dark);
+  background: var(--main);
+  border: 6px solid var(--field);
   border-radius: 8px;
 
   font-family: "Goodland", system-ui, sans-serif;
-  color: var(--text-dark);
+  color: var(--text);
 }
 
 /* Brand */
@@ -118,7 +118,7 @@ br{ display:none; }
   font-weight: 800;
   letter-spacing: .6px;
   font-size: 18px;
-  color: var(--text-dark);
+  color: var(--text);
 }
 
 /* Headline */
@@ -149,9 +149,9 @@ input{
   font-family: "Goodland", system-ui, sans-serif;
   font-size: 14px;
 
-  color: var(--text-dark);
-  background: var(--field-dark);
-  border: 2px solid var(--text-dark);
+  color: var(--text);
+  background: var(--field);
+  border: 2px solid var(--text);
   border-radius: 6px;
   outline: none;
 }
@@ -161,7 +161,7 @@ input::placeholder{
 }
 
 input:focus{
-  border-color: var(--accent-dark);
+  border-color: var(--accent);
 }
 
 /* Primary Button */
@@ -174,8 +174,8 @@ input:focus{
   font-size: 14px;
   font-weight: 800;
 
-  color: var(--text-dark);
-  background: var(--today-dark);
+  color: var(--text);
+  background: var(--today);
   border: 0;
   border-radius: 6px;
   cursor: pointer;
@@ -196,7 +196,7 @@ input:focus{
   text-align: center;
   font-family: "Goodland", system-ui, sans-serif;
   font-size: 13px;
-  color: var(--text-dark);
+  color: var(--text);
 }
 
 .link-btn{
@@ -210,7 +210,7 @@ input:focus{
   font-size: 13px;
   font-weight: 800;
 
-  color: var(--accent-dark);
+  color: var(--accent);
   cursor: pointer;
 }
 

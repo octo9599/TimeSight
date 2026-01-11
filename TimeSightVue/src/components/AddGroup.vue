@@ -203,7 +203,7 @@ async function createGroup() {
 
 <style scoped>
 .add-group-form {
-    background: var(--main-dark);
+    background: var(--main);
     padding: 2rem;
     border-radius: 8px;
     max-width: 500px;
@@ -225,7 +225,7 @@ h2 {
 }
 
 #groupName {
-    border: solid 3px var(--text-dark);
+    border: solid 3px var(--text);
     border-radius: 1.5vmax;
 }
 
@@ -282,7 +282,7 @@ input[type="text"] {
 
 .btn {
     padding: 0.75rem 1.5rem;
-    border: solid 1.5px var(--text-dark);
+    border: solid 1.5px var(--text);
     background: transparent;
     border-radius: 4px;
     font-weight: 500;
@@ -294,12 +294,12 @@ input[type="text"] {
 }
 
 .btn-primary {
-    /* background: var(--accent-dark); */
-    color: var(--text-dark);
+    /* background: var(--accent); */
+    color: var(--text);
 }
 
 /* .btn-primary:hover:not(:disabled) {
-    background: var(--accent-dark);
+    background: var(--accent);
 }*/
 
 .btn-primary:disabled {
@@ -309,8 +309,8 @@ input[type="text"] {
 
 .btn-secondary {
     background: transparent;
-    color: var(--text-dark);
-    border: 1px solid var(--text-dark);
+    color: var(--text);
+    border: 1px solid var(--text);
 }
 
 /* .btn-secondary:hover:not(:disabled) {

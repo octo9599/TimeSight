@@ -126,8 +126,8 @@ async function delUser() {
 </template>
 <style scoped>
 #field {
-    background-color: var(--field-dark);
-    border: 5px solid var(--field-dark);
+    background-color: var(--field);
+    border: 5px solid var(--field);
     border-radius: 10px;
     margin: 2rem 10rem 2rem 10rem;
 }
@@ -148,14 +148,14 @@ table {
 }
 
 tr {
-    border-bottom: 5px solid var(--field-dark);
+    border-bottom: 5px solid var(--field);
 }
 
 td {
     width: 50%;
     padding: 1rem;
     font-size: larger;
-    background-color: var(--main-dark);
+    background-color: var(--main);
 }
 
 #del-container {
@@ -164,7 +164,7 @@ td {
 }
 
 input {
-    background-color: var(--text-dark);
+    background-color: var(--text);
     border: 0px;
     border-radius: 3px;
 }
@@ -177,13 +177,13 @@ button {
 }
 
 #del-button {
-    color: var(--text-dark);
-    background-color: var(--main-dark);
+    color: var(--text);
+    background-color: var(--main);
 }
 
 .change-button {
-    color: var(--text-dark);
-    background-color: var(--field-dark);
+    color: var(--text);
+    background-color: var(--field);
 }
 
 
@@ -200,12 +200,12 @@ button {
     width: min(520px, 92vw);
     padding: 26px;
 
-    background: var(--main-dark);
-    border: 6px solid var(--field-dark);
+    background: var(--main);
+    border: 6px solid var(--field);
     border-radius: 8px;
 
     font-family: "Goodland", system-ui, sans-serif;
-    color: var(--text-dark);
+    color: var(--text);
 }
 
 .headline {
@@ -214,8 +214,8 @@ button {
 }
 
 .apply-button {
-    color: var(--text-dark);
-    background: var(--today-dark);
+    color: var(--text);
+    background: var(--today);
     border: 0;
     border-radius: 6px;
     cursor: pointer;
@@ -230,8 +230,8 @@ button {
     font-size: 14px;
     font-weight: 800;
 
-    color: var(--text-dark);
-    background: var(--today-dark);
+    color: var(--text);
+    background: var(--today);
     border: 0;
     border-radius: 6px;
     cursor: pointer;

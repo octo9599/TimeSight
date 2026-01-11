@@ -279,7 +279,7 @@ h1, h2, h3 {
     margin-top: 20px;
     background: var(--accent);
     color: white;
-    border: var(--text-dark) solid 2px;
+    border: var(--text) solid 2px;
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 500;
@@ -288,7 +288,7 @@ h1, h2, h3 {
 }
 
 .create-group-btn:hover:not(:disabled), .join-group-btn:hover:not(:disabled) {
-    background: var(--accent-dark);
+    background: var(--accent);
 }
 
 .create-group-btn:disabled, .join-group-btn:disabled {
@@ -305,8 +305,8 @@ h1, h2, h3 {
 }
 
 .group-item {
-    background-color: var(--main-dark);
-    border: 5px solid var(--field-dark);
+    background-color: var(--main);
+    border: 5px solid var(--field);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -331,25 +331,25 @@ h1, h2, h3 {
 
 .no-members,
 .no-groups {
-    color: var(--text-dark);
+    color: var(--text);
     text-align: center;
     font-size: 1.5rem;
 }
 
 h2 {
-    color: var(--text-dark);
+    color: var(--text);
     margin: 0 auto;
     text-align: center;
 }
 
 h3 {
-    color: var(--text-dark);
+    color: var(--text);
     margin: 10px 0 5px 0;
     font-size: 1rem;
 }
 
 .member-names {
-    color: var(--text-dark);
+    color: var(--text);
     font-size: 0.9em;
     line-height: 1.4;
 }
@@ -371,7 +371,7 @@ h3 {
 }
 
 .modal-window {
-    background: var(--main-dark);
+    background: var(--main);
     border-radius: 12px;
     width: min(600px, 90vw);
     max-height: 85vh;

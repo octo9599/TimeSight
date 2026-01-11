@@ -1,39 +1,55 @@
 <script setup>
-	import SideBar from "@/components/SideBar.vue";
-	import TopBar from "@/components/TopBar.vue";
-	import AddTask from "./components/AddTask.vue";
-	import { useLoadTaskStore } from '@/stores/loadTask.ts';
-	import { useRouter } from "vue-router";
-	import { ref } from "vue";
-	import AccPopup from "./components/AccPopup.vue";
+import SideBar from "@/components/SideBar.vue";
+import TopBar from "@/components/TopBar.vue";
+import AddTask from "./components/AddTask.vue";
+import AccPopup from "./components/AccPopup.vue";
 
-	const router = useRouter();
-	const loadTaskStore = useLoadTaskStore();
-	const isAddVisible = ref(false);
+import { useLoadTaskStore } from '@/stores/loadTask.ts';
+import { useRouter } from "vue-router";
+import { ref, watch, onMounted } from "vue";
 
-	const isPopupVisible = ref(false);
+const router = useRouter();
+const loadTaskStore = useLoadTaskStore();
 
-	function addChangeVisibility() {
-		isAddVisible.value = !isAddVisible.value;
-		if (!isAddVisible.value) {
-			loadTaskStore.shouldLoad = true;
-		}
-	}
+const isAddVisible = ref(false);
+const isPopupVisible = ref(false);
 
-	function popupChangeVisibility(pos) {
-		isPopupVisible.value = !isPopupVisible.value;
-	}
+const darkMode = ref(false);
+
+watch(darkMode, (val) => {
+  document.documentElement.classList.toggle("dark", val);
+  localStorage.setItem("darkMode", val);
+});
+
+onMounted(() => {
+  const saved = localStorage.getItem("darkMode");
+  if (saved !== null) {
+    darkMode.value = saved === "true";
+  }
+});
+
+
+function addChangeVisibility() {
+  isAddVisible.value = !isAddVisible.value;
+  if (!isAddVisible.value) {
+    loadTaskStore.shouldLoad = true;
+  }
+}
+
+function popupChangeVisibility() {
+  isPopupVisible.value = !isPopupVisible.value;
+}
 </script>
 
 <template>
-	<TopBar :showAcc="router.currentRoute.value.path != '/auth'" @showPopup="popupChangeVisibility"/>
+	<TopBar :showAcc="router.currentRoute.value.path != '/auth'" :darkMode="darkMode" @showPopup="popupChangeVisibility"/>
 	<div id="horizontal-container">
 		<div id="sidebar">
-			<SideBar v-if="router.currentRoute.value.path != '/auth'" @addTask="addChangeVisibility" />
+			<SideBar v-if="router.currentRoute.value.path != '/auth'" :darkMode="darkMode" @addTask="addChangeVisibility" />
 		</div>
 		<div id="test">
 			<div v-if="isPopupVisible" class="popup-overlay" @click.self="popupChangeVisibility">
-				<AccPopup @close="popupChangeVisibility" class="popup-window"/>
+				<AccPopup :darkMode="darkMode" @toggle-theme="darkMode = !darkMode" @close="popupChangeVisibility" class="popup-window"/>
 			</div>
 			<RouterView />
 			<div v-if="isAddVisible" class="modal-overlay" @click.self="addChangeVisibility">
@@ -58,13 +74,13 @@
 
 #sidebar {
 	grid-column: 1;
-	background-color: var(--main-dark);
+	background-color: var(--main);
 }
 
 #test {
 	grid-column: 2;
-	background-color: var(--main-dark);
-	color: var(--text-dark);
+	background-color: var(--main);
+	color: var(--text);
 	margin: 0;
 }
 
@@ -85,7 +101,7 @@
 }
 
 .modal-window {
-	background: var(--main-dark);
+	background: var(--main);
 	border-radius: 12px;
 	width: min(600px, 90vw);
 	max-height: 85vh;
