@@ -505,7 +505,7 @@ app.delete("/gruppe/:group_id", async (req, res) => {
             return res.status(400).json({error: "group_id is required to delete a group"});
         }
 
-        await runQuery("DELETE FROM Termin WHERE fk_group_id = ?", [group_id]);
+        await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Ban WHERE fk_group_id = ?", [group_id]);
@@ -584,6 +584,8 @@ app.delete("/termin/:termin_id", async (req, res) => {
         if (!termin_id) {
             return res.status(400).json({error: "termin_id is required to delete a task"});
         }
+
+        await runQuery("DELETE FROM Termin_User WHERE fk_termin_id = ?", [termin_id]);
 
         const result = await runQuery(
             "DELETE FROM Termin WHERE pk_termin_id = ?",
