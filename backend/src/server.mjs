@@ -324,8 +324,8 @@ app.post("/termin", async (req, res) => {
     try {
         let date_time = `${datum} ${uhrzeit}:00`;
         const result = await runQuery(
-            //Termin (pk_termin, bezeichnung, beschreibung, datum, ist_erledigt, fk_group_id, fk_ersteller_id)
-            "INSERT INTO Termin VALUES (null, ?, ?, ?, FALSE, ?, ?)",
+            //Termin (pk_termin, bezeichnung, beschreibung, datum, fk_group_id, fk_ersteller_id)
+            "INSERT INTO Termin VALUES (null, ?, ?, ?, ?, ?)",
             [bezeichnung, desc, date_time, group_id, user_id]
         );
 
