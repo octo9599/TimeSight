@@ -191,8 +191,7 @@ function goBack() {
         <div v-if="phase === 'confirm'">
             <h2>Bestätige Beitritt</h2>
             <p>
-                Du bist dabei, eine Beitrittsanfrage an die Gruppe
-                <i>{{ groupName }}</i> zu senden.
+                Du bist dabei, eine Beitrittsanfrage an die Gruppe  <i>{{ groupName }}</i> zu senden.
             </p>
 
             <p v-if="isBanned" style="color:crimson">
@@ -306,5 +305,9 @@ input[type="text"] {
     margin-top: 1rem;
     color: green;
     font-weight: bold;
+}
+
+i {
+    color: var(--accent);
 }
 </style>
