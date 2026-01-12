@@ -15,35 +15,27 @@ const isLoading = ref(false);
 const inviteCode = ref("");
 const showCodes = ref({});
 const inviteRequests = ref({});
-
 const isUserAdmin = ref({});
-
 const showGroupManagement = ref({});
 
-// Fetch groups data
 const fetchGroups = async () => {
     try {
         isLoading.value = true;
         const data = await fetchData();
         groups.value = data.groupsIn?.data || [];
         usersInGroup.value = data.groupUsers || {};
-        for(const group of groups.value) {
-            //fetch invites per group
-            inviteRequests.value[group.pk_group_id] = await fetchInviteRequests(group.pk_group_id);
 
-            //check if user is admin per group
+        for (const group of groups.value) {
+            inviteRequests.value[group.pk_group_id] =
+                await fetchInviteRequests(group.pk_group_id);
+
             const user_perms = (await axios.get(`${API}/gruppe_user`, {
                 params: { user_id: data.user.pk_user_id, group_id: group.pk_group_id }
             })).data[0];
-            if(!user_perms) {
-                throw new Error(`No user entry found in group ${group.gruppenname}`)
-            }
-            isUserAdmin.value[group.pk_group_id] = user_perms.ist_admin == 1;
 
-            //fill showGroupManagement
+            isUserAdmin.value[group.pk_group_id] = user_perms?.ist_admin == 1;
             showGroupManagement.value[group.pk_group_id] = false;
         }
-
     } catch (error) {
         console.error('Error fetching groups:', error);
     } finally {
@@ -52,55 +44,53 @@ const fetchGroups = async () => {
 };
 
 async function fetchInviteRequests(group_id) {
-
     try {
-        const requests = (await axios.get(`${API}/gruppe/${group_id}/beitritt_anfrage`)).data;
+        const requests =
+            (await axios.get(`${API}/gruppe/${group_id}/beitritt_anfrage`)).data;
+
+        if (requests.length === 0) return null;
+
         const output = [];
-        for(const request of requests) {
-            const user = (await axios.get(`${API}/user/${request.fk_user_id}`)).data[0];
-            output.push({ anfrage_id: request.pk_anfrage_id, user_id: request.fk_user_id, group_id, username: user.username});
+        for (const request of requests) {
+            const user =
+                (await axios.get(`${API}/user/${request.fk_user_id}`)).data[0];
+            output.push({
+                anfrage_id: request.pk_anfrage_id,
+                user_id: request.fk_user_id,
+                group_id,
+                username: user.username
+            });
         }
-        if(requests.length === 0) {
-            return null;
-        }
-        
         return output;
     } catch (err) {
         console.error('Error fetching invite-requests: ', err);
     }
 }
 
-// Initial fetch
 onMounted(fetchGroups);
 
-// Show create group modal
 async function showCreateGroup() {
     addGroupVisible.value = true;
     await nextTick();
 }
 
-// Close create group modal
 function closeCreateGroup() {
     addGroupVisible.value = false;
 }
 
-// Handle successful group creation
 async function handleGroupCreated() {
     await fetchGroups();
 }
 
-// Show join group modal
 async function showJoinGroup() {
     joinGroupVisible.value = true;
     await nextTick();
 }
 
-// Close join group modal
 function closeJoinGroup() {
     joinGroupVisible.value = false;
 }
 
-// Handle successful group joining
 async function handleGroupJoined() {
     closeJoinGroup();
     await fetchGroups();
@@ -108,11 +98,9 @@ async function handleGroupJoined() {
 
 function generateInviteCode() {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let result = "";
-    for (let i = 0; i < 8; i++) {
-        result += letters[Math.floor(Math.random() * letters.length)];
-    }
-    inviteCode.value = result;
+    inviteCode.value = Array.from({ length: 8 }, () =>
+        letters[Math.floor(Math.random() * letters.length)]
+    ).join("");
 }
 
 async function checkIfInviteCodeExists(code) {
@@ -120,148 +108,167 @@ async function checkIfInviteCodeExists(code) {
         const res = await axios.get(`${API}/gruppe`, {
             params: { invite_code: code }
         });
-
-        // Common safe checks:
-        // - If backend returns an array of matches: return res.data.length > 0
-        // - If backend returns { exists: true/false }: return !!res.data.exists
-        // - If backend returns a single object when found or null when not: return !!res.data
-        if (Array.isArray(res.data)) {
-            return res.data.length > 0;
-        }
-        if (res.data && typeof res.data === 'object') {
-            if ('exists' in res.data) return !!res.data.exists;
-            // if object returned for found, empty object for not found -> check keys
-            return Object.keys(res.data).length > 0;
-        }
-        // fallback for scalar responses
-        return !!res.data;
-    } catch (err) {
-        console.error('Error checking invite code:', err);
-        // On network error we return false so we don't block creation — adjust if you prefer otherwise.
+        return Array.isArray(res.data) ? res.data.length > 0 : !!res.data;
+    } catch {
         return false;
     }
 }
 
 async function updateCode(group_id) {
+    do {
+        generateInviteCode();
+    } while (await checkIfInviteCodeExists(inviteCode.value));
 
-    try {
-        if(!group_id) {
-            throw new Error("updateCode() called without group_id");
-        }
-        do {
-            generateInviteCode();
-        } while (await checkIfInviteCodeExists(inviteCode.value));
-        await axios.patch(`${API}/gruppe/${group_id}`, {invite_code: inviteCode.value});
-        await fetchGroups();
+    await axios.patch(`${API}/gruppe/${group_id}`, {
+        invite_code: inviteCode.value
+    });
 
-        
-    } catch (err) {
-        console.error(err);
-    }
-
+    await fetchGroups();
 }
 
 function showCode(group_id) {
     showCodes.value[group_id] = !showCodes.value[group_id];
-
 }
 
-async function answerInvite(request, is_accepted) {
-
-    try {
-
-        await axios.delete(`${API}/beitritt_anfrage/${request.anfrage_id}`);
-        if(is_accepted) {
-            await axios.post(`${API}/gruppe_user`, {
-                markierungsfarbe: null,
-                ist_admin: 0,
-                kann_bearbeiten: 0,
-                kann_loeschen: 0,
-                group_id: request.group_id,
-                user_id: request.user_id
-            });
-        }
-
-        await fetchGroups();
-
-    } catch(err) {
-        console.error("Error answering invite: ", err);
+async function answerInvite(request, accepted) {
+    await axios.delete(`${API}/beitritt_anfrage/${request.anfrage_id}`);
+    if (accepted) {
+        await axios.post(`${API}/gruppe_user`, {
+            markierungsfarbe: null,
+            ist_admin: 0,
+            kann_bearbeiten: 0,
+            kann_loeschen: 0,
+            group_id: request.group_id,
+            user_id: request.user_id
+        });
     }
-
+    await fetchGroups();
 }
 
 async function changeShowGroupMngmt(group_id) {
-    showGroupManagement.value[group_id] = !showGroupManagement.value[group_id];
-    if(!showGroupManagement.value[group_id]) {
+    showGroupManagement.value[group_id] =
+        !showGroupManagement.value[group_id];
+
+    if (!showGroupManagement.value[group_id]) {
         await fetchGroups();
     }
 }
-
 </script>
 
 <template>
     <div class="groups-container">
-        <!-- Show existing groups -->
         <ul v-if="groups.length" class="groups-list">
-            <li v-for="group in groups" :key="group.pk_group_id" class="group-item">
+            <li v-for="group in groups"
+                :key="group.pk_group_id"
+                class="group-item">
+
                 <div class="group-header">
                     <h2>{{ group.gruppenname }}</h2>
+
                     <span v-if="isUserAdmin[group.pk_group_id]">
-                        <button @click="updateCode(group.pk_group_id)">Code neu generieren</button>
-                        <button @click="showCode(group.pk_group_id)">Toggle Code</button>
-                        <button @click="changeShowGroupMngmt(group.pk_group_id)">Gruppe Verwalten</button>
-                        <div v-if="showCodes[group.pk_group_id]">{{ group.invite_code }}</div>
-                        <div v-if="showGroupManagement[group.pk_group_id]" class="modal-overlay" @click.self="changeShowGroupMngmt(group.pk_group_id)">
-                            <div class="modal-window">
-                                <GroupManagement :group="group" @close="changeShowGroupMngmt(group.pk_group_id)"/>
-                            </div>
-                        </div>
+                        <button @click="updateCode(group.pk_group_id)">
+                            Code neu generieren
+                        </button>
+                        <button @click="showCode(group.pk_group_id)">
+                            Toggle Code
+                        </button>
+                        <button @click="changeShowGroupMngmt(group.pk_group_id)">
+                            Gruppe Verwalten
+                        </button>
                     </span>
                 </div>
-                <div v-if="usersInGroup[group.pk_group_id]" class="members-list">
+
+                <!-- Invite Code (Variante B, eigene Zeile) -->
+                <div v-if="showCodes[group.pk_group_id]"
+                     class="invite-code-row">
+                    {{ group.invite_code }}
+                </div>
+
+                <!-- Group Management Modal -->
+                <div v-if="showGroupManagement[group.pk_group_id]"
+                     class="modal-overlay"
+                     @click.self="changeShowGroupMngmt(group.pk_group_id)">
+                    <div class="modal-window">
+                        <GroupManagement
+                            :group="group"
+                            @close="changeShowGroupMngmt(group.pk_group_id)"
+                        />
+                    </div>
+                </div>
+
+                <div v-if="usersInGroup[group.pk_group_id]"
+                     class="members-list">
                     <h3>Members:</h3>
                     <span class="member-names">
-                        {{ usersInGroup[group.pk_group_id].map(user => user.username).join(', ') }}
+                        {{ usersInGroup[group.pk_group_id]
+                            .map(u => u.username)
+                            .join(', ') }}
                     </span>
                 </div>
+
                 <div v-else class="no-members">
                     No members found
                 </div>
-                <ul v-if="isUserAdmin[group.pk_group_id] && inviteRequests[group.pk_group_id] != null" class="invite-reqs">
+
+                <ul v-if="isUserAdmin[group.pk_group_id]
+                        && inviteRequests[group.pk_group_id]"
+                    class="invite-reqs">
                     Invite Requests:
-                    <li v-for="request of inviteRequests[group.pk_group_id]">
+                    <li v-for="request in inviteRequests[group.pk_group_id]">
                         {{ request.username }} will beitreten
-                        <button @click="answerInvite(request, true)">Annehmen</button>
-                        <button @click="answerInvite(request, false)">Ablehnen</button>
+                        <button @click="answerInvite(request, true)">
+                            Annehmen
+                        </button>
+                        <button @click="answerInvite(request, false)">
+                            Ablehnen
+                        </button>
                     </li>
                 </ul>
             </li>
         </ul>
-        <p v-else class="no-groups">No groups found or loading...</p>
-        <button @click="showCreateGroup" class="create-group-btn" :disabled="isLoading">
-            <span v-if="isLoading">Lade Gruppen...</span>
+
+        <p v-else class="no-groups">
+            No groups found or loading...
+        </p>
+
+        <button @click="showCreateGroup"
+                class="create-group-btn"
+                :disabled="isLoading">
+            <span v-if="isLoading">Lade Gruppen…</span>
             <span v-else>+ Neue Gruppe erstellen</span>
         </button>
-        <button @click="showJoinGroup" class="join-group-btn">
-            <span>Gruppe beitreten</span>
+
+        <button @click="showJoinGroup"
+                class="join-group-btn">
+            Gruppe beitreten
         </button>
     </div>
 
-    <!-- Create Group Modal -->
-    <div v-if="addGroupVisible" class="modal-overlay" @click.self="closeCreateGroup">
-        <AddGroup @close="closeCreateGroup" @keyup.esc="closeCreateGroup" @group-created="handleGroupCreated"
-            class="modal-window" />
+    <!-- Create Group -->
+    <div v-if="addGroupVisible"
+         class="modal-overlay"
+         @click.self="closeCreateGroup">
+        <AddGroup
+            class="modal-window"
+            @close="closeCreateGroup"
+            @group-created="handleGroupCreated"
+        />
     </div>
 
-    <!-- Join Group Modal -->
-    <div v-if="joinGroupVisible" class="modal-overlay" @click.self="closeJoinGroup">
-        <JoinGroup @close="closeJoinGroup" @keyup.esc="closeJoinGroup" @group-joined="handleGroupJoined"
-            class="modal-window" />
+    <!-- Join Group -->
+    <div v-if="joinGroupVisible"
+         class="modal-overlay"
+         @click.self="closeJoinGroup">
+        <JoinGroup
+            class="modal-window"
+            @close="closeJoinGroup"
+            @group-joined="handleGroupJoined"
+        />
     </div>
 </template>
 
 <style scoped>
-h1, h2, h3 {
+    h1, h2, h3 {
     letter-spacing: 1px;
     color: var(--text);
 }
@@ -293,16 +300,17 @@ h1, h2, h3 {
     max-width: 900px;
 
     background: var(--main);
-
     border: 7px solid var(--field);
     border-radius: 16px;
 
     padding: 0;
-    overflow: hidden;
-
     position: relative;
     box-shadow: none;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .group-header {
     display: flex;
@@ -321,31 +329,38 @@ h1, h2, h3 {
     font-weight: 600;
 }
 
-/* Header action buttons */
+.group-header > span {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 
 .group-header button {
     background: none;
     border: none;
     color: var(--accent);
     font-size: 0.85rem;
-    margin-left: 1.25rem;
     cursor: pointer;
     padding: 0;
+
+    white-space: nowrap;
 }
 
 .group-header button:hover {
     text-decoration: underline;
 }
 
-.group-header > span > div {
-    position: absolute;
-    left: 50%;
-    top: 56px;
-    transform: translateX(-50%);
+/* =========================
+   INVITE CODE – VARIANTE B
+========================= */
 
+.invite-code-row {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+
+    margin: 12px auto 0 auto;
+    width: fit-content;
 
     font-family: monospace;
     font-size: 1.1rem;
@@ -354,26 +369,30 @@ h1, h2, h3 {
     color: var(--accent);
     background: var(--main);
 
-    padding: 10px 18px;
+    padding: 10px 20px;
     border-radius: 12px;
-
     border: 2px solid var(--field);
-    box-shadow: none;
 }
 
-/* Header extra space when invite code is visible */
-.group-header:has(> span > div) {
-    padding-bottom: 56px;
-}
+/* =========================
+   MEMBERS
+========================= */
 
 .members-list {
     padding: 18px 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .members-list h3 {
     font-size: 0.9rem;
     opacity: 0.7;
     margin-bottom: 6px;
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .member-names {
@@ -382,11 +401,16 @@ h1, h2, h3 {
     opacity: 0.9;
 }
 
+/* =========================
+   INVITE REQUESTS
+========================= */
+
 .invite-reqs {
     list-style: none;
     padding: 14px 20px;
-    margin: 0;
+    margin: 12px 0 0 0;
 
+    background: var(--main);
     border-top: 2px solid var(--field);
     font-size: 0.9rem;
 }
@@ -407,7 +431,7 @@ h1, h2, h3 {
 }
 
 .invite-reqs button:first-of-type {
-    color: #4ade80;
+    color: var(--done);
 }
 
 .invite-reqs button:last-of-type {
@@ -418,6 +442,9 @@ h1, h2, h3 {
     text-decoration: underline;
 }
 
+/* =========================
+   EMPTY STATES
+========================= */
 
 .no-members,
 .no-groups {
@@ -427,6 +454,10 @@ h1, h2, h3 {
     opacity: 0.7;
     margin-top: 2rem;
 }
+
+/* =========================
+   BOTTOM BUTTONS
+========================= */
 
 .create-group-btn,
 .join-group-btn {
@@ -452,7 +483,12 @@ h1, h2, h3 {
 .create-group-btn:hover,
 .join-group-btn:hover {
     background: var(--accent);
+    color: #fff;
 }
+
+/* =========================
+   MODAL (GroupManagement)
+========================= */
 
 .modal-overlay {
     position: fixed;
@@ -460,7 +496,6 @@ h1, h2, h3 {
 
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
 
     display: flex;
     align-items: center;
@@ -473,13 +508,13 @@ h1, h2, h3 {
     background: var(--main);
     border-radius: 16px;
 
-    width: min(600px, 90vw);
-    max-height: 85vh;
+    width: min(700px, 90vw);
+    max-height: 90vh;
     overflow-y: auto;
 
     padding: 1.5rem;
 
     border: 2px solid var(--field);
-    box-shadow: none;
 }
+
 </style>

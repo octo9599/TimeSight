@@ -458,7 +458,7 @@ async function deleteGroup() {
         <div v-if="showBannedUsers">
             <div v-for="user in bannedUsers">
                 {{ user.username }}
-                <button
+                <button class = "unban-btn"
                     @click="unbanUser(user.ban_id)"
                 >
                     Unban
@@ -515,4 +515,226 @@ async function deleteGroup() {
 </template>
 
 <style scoped>
+    /* =========================
+    MODAL BASIS
+    ========================= */
+
+    .modal-window {
+        width: 92vw;
+        max-width: 1200px;
+        max-height: 85vh;
+
+        background: var(--main);
+        border: 7px solid var(--field);
+        border-radius: 22px;
+
+        padding: 32px;
+        overflow-y: auto;
+
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+
+        box-shadow: none;
+        font-weight: 400;
+    }
+
+    /* =========================
+    HEADER
+    ========================= */
+
+    .modal-window > div:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-window > div:first-child span {
+        font-size: 1.6rem;
+        font-weight: 400;
+        color: var(--text);
+    }
+
+    .modal-window > div:first-child button {
+        background: var(--field);
+        border: none;
+        color: var(--text);
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 400;
+    }
+
+    .modal-window > div:first-child button:last-child {
+        background: #ef4444;
+        color: #fff;
+    }
+
+    /* =========================
+    USER CARD
+    ========================= */
+
+    .modal-window > div:nth-child(2) > div {
+        background: var(--main);
+        border: 3px solid var(--field);
+        border-radius: 16px;
+
+        padding: 18px 22px;
+
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* =========================
+    USER NAME + ACTIONS
+    ========================= */
+
+    .modal-window > div:nth-child(2) > div > p:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        font-size: 1.3rem;
+        font-weight: 400;
+        color: var(--text);
+    }
+
+    /* Kick / Ban */
+
+    /* Kick / Ban – korrekt & kompatibel */
+
+    .modal-window button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 400;
+        padding: 0;
+    }
+
+    /* Kick → weiß (dark/light kompatibel) */
+    .modal-window p:first-child button:first-of-type {
+        color: var(--text);
+    }
+
+    /* Ban → rot */
+    .modal-window p:first-child button:nth-of-type(2) {
+        color: #ef4444;
+    }
+
+
+    /* =========================
+    RECHTE ZEILE
+    ========================= */
+
+    .modal-window p:has(input[type="checkbox"]) {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 16px;
+
+        font-size: 1rem;
+        color: var(--text);
+    }
+
+    /* =========================
+    CHECKBOX – EXAKT WIE TASKVIEW
+    ========================= */
+
+    input[type="checkbox"] {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        border: 2px solid var(--text);
+        display: grid;
+        place-content: center;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"]::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        background-color: #7fffd4;
+    }
+
+    input[type="checkbox"]:checked::before {
+        transform: scale(1);
+    }
+
+    /* =========================
+    UNTERE ACTION-ZEILE
+    ========================= */
+
+    .modal-window > div:nth-child(2) > button {
+        background: var(--field);
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: var(--text);
+        width: fit-content;
+    }
+
+    /* Gebannte User anzeigen → rechts */
+
+    .modal-window > div:nth-child(2) {
+        position: relative;
+    }
+
+    .modal-window > div:nth-child(2) > button:last-of-type {
+        position: absolute;
+        right: 0;
+        bottom: -48px;
+    }
+
+    /* =========================
+    FOOTER
+    ========================= */
+
+    .modal-window > div:last-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    .modal-window > div:last-child button {
+        background: #ef4444;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 14px 22px;
+        font-weight: 400;
+    }
+
+    /* =========================
+    HEADER BAR (FIELD)
+    ========================= */
+
+    .modal-window > div:first-child {
+        background: var(--field);
+
+        margin: -32px -32px 0 -32px; /* gleicht das Padding der modal-window aus */
+        padding: 24px 32px;
+
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+/* =========================
+   UNBAN BUTTON
+========================= */
+
+.unban-btn {
+    color: #ef4444;
+    margin-left: 66px;
+}
+
+
 </style>
