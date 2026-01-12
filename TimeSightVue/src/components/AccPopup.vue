@@ -9,7 +9,7 @@ defineProps({
 	darkMode: Boolean
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'toggle-theme']);
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 const userId = ref(user.value.pk_user_id);
@@ -25,7 +25,7 @@ onMounted(async () => {
 		<span>{{ user.username }}</span>
 		<hr>
 		<router-link class="links" to="/account" @click="emit('close')">Account</router-link>
-		<button id="mode-btn" @click="$emit('toggle-theme')">{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</button>
+		<button id="mode-btn" @click="emit('toggle-theme')">{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</button>
 		<router-link class="links" id="logout" to="/logout">Log out</router-link>
 	</div>
 </template>
