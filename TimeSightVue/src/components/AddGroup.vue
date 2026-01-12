@@ -16,7 +16,7 @@ const input = ref(null);
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 const userId = ref(0);
-const markierungsfarbe = ref("");
+// const markierungsfarbe = ref("");
 const disableCreate = ref(false);
 
 onMounted(async () => {
@@ -130,7 +130,7 @@ async function createGroup() {
         // Insert into Gruppe_User (Zwischentabelle)
         try {
             await axios.post(`${API}/gruppe_user`, {
-                markierungsfarbe: markierungsfarbe.value, // must be hex like "#rrggbb",
+                // markierungsfarbe: markierungsfarbe.value, // must be hex like "#rrggbb"
                 ist_admin: 1,
                 kann_bearbeiten: 1,
                 kann_loeschen: 1,
@@ -167,14 +167,14 @@ async function createGroup() {
             </div>
 
             <!-- NEW: markierungsfarbe input -->
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="markierungsfarbe">Markierungsfarbe</label>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
                     <input id="markierungsfarbe" type="color" v-model="markierungsfarbe" :disabled="isLoading" />
                     <input type="text" v-model="markierungsfarbe" readonly style="width:8rem; padding:0.4rem; border-radius:4px;" />
                 </div>
                 <small>Wählen Sie eine Farbe für die Termine dieser Gruppe (accountgebunden)</small>
-            </div>
+            </div> -->
 
             <div v-if="inviteCode" class="invite-code">
                 <label>Einladungscode:</label>
