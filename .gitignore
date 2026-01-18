@@ -140,6 +140,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 **/.DS_Store
-**/package-lock.json
 .idea/*
-docker-compose.yaml
+**/package-lock.json
