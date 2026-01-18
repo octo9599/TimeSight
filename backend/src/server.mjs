@@ -11,11 +11,12 @@ dotenv.config();
 if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is missing. Check your .env file.");
 }
+const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
 //initialize app
 const app = express();
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: corsOrigin,
     credentials: true
 }));
 app.use(express.json());
@@ -23,10 +24,11 @@ app.use(express.json());
 
 //connect to the database
 const pool = mariadb.createPool({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASS || "root",
-    database: process.env.DB_NAME || "TimeSight",
+    host: process.env.DB_HOST ?? "localhost",
+    port: Number(process.env.DB_PORT) || 3306,
+    user: process.env.DB_USER ?? "root",
+    password: process.env.DB_PASSWORD ?? "root",
+    database: process.env.DB_NAME ?? "TimeSight",
     connectionLimit: 5,
     dateStrings: true,
 });
@@ -207,10 +209,13 @@ app.post("/login", async (req, res) => {
                 {expiresIn: "7d"}
             );
 
+            const cookieSecure = (process.env.COOKIE_SECURE === "true");
+            const cookieSameSite = process.env.COOKIE_SAMESITE || "lax";
+
             res.cookie("auth", token, {
                 httpOnly: true,
-                secure: false,
-                sameSite: "lax",
+                secure: cookieSecure,
+                sameSite: cookieSameSite,
                 maxAge: 1000 * 60 * 60 * 24 * 7
             });
 
@@ -331,7 +336,7 @@ app.post("/termin", async (req, res) => {
         return res.status(400).json({error: "bezeichnung, datum, uhrzeit, group_id and user_id are required to create a task."});
     }
 
-    if(beschreibung) {
+    if (beschreibung) {
         desc = beschreibung;
     }
 
@@ -392,7 +397,7 @@ app.post("/gruppe/:group_id/termin_user", async (req, res) => {
 
         const termine = await runQuery("SELECT * FROM Termin WHERE fk_group_id = ? AND datum >= CURDATE()", [group_id]);
 
-        for(const termin of termine) {
+        for (const termin of termine) {
             const result = await runQuery(
                 //Termin (ist_erledigt, fk_termin_id, fk_user_id)
                 "INSERT INTO Termin_User VALUES (FALSE, ?, ?)",
@@ -604,8 +609,8 @@ app.delete("/gruppe_user", async (req, res) => {
             return res.status(400).json({error: "user_id and group_id are required to remove a user from a group"});
         }
 
-        await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ? AND tu.fk_user_id = ?", 
-        [group_id, user_id]);
+        await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ? AND tu.fk_user_id = ?",
+            [group_id, user_id]);
 
         const result = await runQuery(
             "DELETE FROM Gruppe_User WHERE fk_user_id = ? AND fk_group_id = ?",
@@ -841,7 +846,7 @@ app.patch("/termin_user", async (req, res) => {
     const {termin_id, user_id} = req.query;
     const {ist_erledigt} = req.body;
 
-    if(!termin_id || !user_id) {
+    if (!termin_id || !user_id) {
         return res.status(400).json({error: "termin_id and user_id required for patching a termin_user entry"});
     }
 
@@ -853,7 +858,8 @@ app.patch("/termin_user", async (req, res) => {
         const result = await runQuery(`
             UPDATE Termin_User
             SET ist_erledigt = ?
-            WHERE fk_termin_id = ? AND fk_user_id = ? `, [ist_erledigt, termin_id, user_id]);
+            WHERE fk_termin_id = ?
+              AND fk_user_id = ? `, [ist_erledigt, termin_id, user_id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({error: "Task not found"});
@@ -914,7 +920,7 @@ app.patch("/gruppe_user", async (req, res) => {
 
 
 //Define on which port the backend runs.
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`API running at http://localhost:${PORT}`);
+const PORT = process.env.BACKEND_PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`API running on port ${PORT}`);
 });

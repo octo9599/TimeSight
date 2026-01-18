@@ -1,227 +1,231 @@
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useUserStore } from '@/stores/user';
+import { ref } from 'vue'
+import axios from 'axios'
+import { useUserStore } from '@/stores/user'
+import { API } from '@/components/DataAccess.mjs'
 
-const API = "http://localhost:3000"
-const username = ref("");
-const password = ref("");
+// const API = 'http://localhost:3000'
+const username = ref('')
+const password = ref('')
 
-const failed = ref("");
+const failed = ref('')
 
-const userStore = useUserStore();
-const emit = defineEmits(['switch']);
+const userStore = useUserStore()
+const emit = defineEmits(['switch'])
 
 function notifyParent() {
-    emit('switch');
+	emit('switch')
 }
 async function loginSubmit() {
-  try {
-    await axios.post(
-      `${API}/login`,
-      { username: username.value, passwort: password.value },
-      { withCredentials: true }
-    );
-    window.location.reload();
-  } catch (err) {
-    if(err.status == 401) {
-      failed.value = "Falsches Passwort oder nicht existierender User."
-    } else {
-      failed.value = `Error Code ${err.status}: Something went wrong during login process.`;
-    }
-  }
+	try {
+		await axios.post(
+			`${API}/login`,
+			{ username: username.value, passwort: password.value },
+			{ withCredentials: true },
+		)
+		window.location.reload()
+	} catch (err) {
+		if (err.status == 401) {
+			failed.value = 'Falsches Passwort oder nicht existierender User.'
+		} else {
+			failed.value = `Error Code ${err.status}: Something went wrong during login process.`
+		}
+	}
 }
 </script>
 
 <template>
-  <form @submit.prevent="loginSubmit" class="auth-card">
-    <div class="brand-row">
-      <div class="brand-logo">TimeSight</div>
-    </div>
+	<form @submit.prevent="loginSubmit" class="auth-card">
+		<div class="brand-row">
+			<div class="brand-logo">TimeSight</div>
+		</div>
 
-    <div class="headline">
-      <div class="h1">Willkommen zurück</div>
-      <div class="h2">Melde dich an</div>
-    </div>
+		<div class="headline">
+			<div class="h1">Willkommen zurück</div>
+			<div class="h2">Melde dich an</div>
+		</div>
 
-    <input type="text" placeholder="Username" v-model="username" required />
-    <input type="password" placeholder="Passwort" v-model="password" required />
+		<input type="text" placeholder="Username" v-model="username" required />
+		<input type="password" placeholder="Passwort" v-model="password" required />
 
-    <button type="button" class="link-forgot" @click="notifyParent">
-      Passwort vergessen
-    </button>
+		<button type="button" class="link-forgot" @click="notifyParent">Passwort vergessen</button>
 
-    <div id="error">{{ failed }}</div>
+		<div id="error">{{ failed }}</div>
 
-    <button type="submit" class="btn-primary">Login</button>
+		<button type="submit" class="btn-primary">Login</button>
 
-    <div class="divider"></div>
+		<div class="divider"></div>
 
-    <div class="signup-row">
-      <span>Noch kein Konto?</span>
-      <button type="button" class="link-signup" @click="notifyParent">
-        Account erstellen
-      </button>
-    </div>
-  </form>
+		<div class="signup-row">
+			<span>Noch kein Konto?</span>
+			<button type="button" class="link-signup" @click="notifyParent">
+				Account erstellen
+			</button>
+		</div>
+	</form>
 </template>
 
 <style scoped>
-
 #error {
-  color:crimson;
+	color: crimson;
 }
 
 /* Card zentriert */
-.auth-card{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.auth-card {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 
-  width: min(520px, 92vw);
-  padding: 26px;
+	width: min(520px, 92vw);
+	padding: 26px;
 
-  background: var(--main);
-  border: 6px solid var(--field);
-  border-radius: 8px;
+	background: var(--main);
+	border: 6px solid var(--field);
+	border-radius: 8px;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  color: var(--text);
+	font-family: 'Goodland', system-ui, sans-serif;
+	color: var(--text);
 }
 
 /* Brand */
-.brand-row{
-  display: flex;
-  justify-content: center;
-  margin-bottom: 18px;
+.brand-row {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 18px;
 }
 
-.brand-logo{
-  font-weight: 400;
-  letter-spacing: .6px;
-  font-size: 18px;
-  color: var(--text);
+.brand-logo {
+	font-weight: 400;
+	letter-spacing: 0.6px;
+	font-size: 18px;
+	color: var(--text);
 }
 
 /* Headline */
-.headline{
-  text-align: left;
-  margin-bottom: 14px;
+.headline {
+	text-align: left;
+	margin-bottom: 14px;
 }
 
-.h1{
-  font-size: 18px;
-  font-weight: 400;
+.h1 {
+	font-size: 18px;
+	font-weight: 400;
 }
 
-.h2{
-  margin-top: 4px;
-  font-size: 13px;
-  opacity: .9;
+.h2 {
+	margin-top: 4px;
+	font-size: 13px;
+	opacity: 0.9;
 }
 
 /* Inputs */
-input{
-  display: block;
-  width: 100%;
-  height: 44px;
-  margin-top: 12px;
-  padding: 0 14px;
+input {
+	display: block;
+	width: 100%;
+	height: 44px;
+	margin-top: 12px;
+	padding: 0 14px;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  font-size: 14px;
+	font-family: 'Goodland', system-ui, sans-serif;
+	font-size: 14px;
 
-  color: var(--text);
-  background: var(--field);
-  border: 2px solid var(--text);
-  border-radius: 6px;
-  outline: none;
+	color: var(--text);
+	background: var(--field);
+	border: 2px solid var(--text);
+	border-radius: 6px;
+	outline: none;
 }
 
-input::placeholder{
-  color: rgba(219, 241, 255, 0.65);
+input::placeholder {
+	color: rgba(219, 241, 255, 0.65);
 }
 
-input:focus{
-  border-color: var(--accent);
+input:focus {
+	border-color: var(--accent);
 }
 
 /* Passwort vergessen */
-.link-forgot{
-  margin-top: 12px;
-  padding: 0;
-  background: none;
-  border: none;
+.link-forgot {
+	margin-top: 12px;
+	padding: 0;
+	background: none;
+	border: none;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+	font-family: 'Goodland', system-ui, sans-serif;
+	font-size: 13px;
+	font-weight: 700;
 
-  color: var(--accent);
-  cursor: pointer;
-  text-align: left;
+	color: var(--accent);
+	cursor: pointer;
+	text-align: left;
 }
 
-.link-forgot:hover{
-  text-decoration: underline;
+.link-forgot:hover {
+	text-decoration: underline;
 }
 
 /* Primary Button */
-.btn-primary{
-  margin-top: 16px;
-  width: 100%;
-  height: 42px;
+.btn-primary {
+	margin-top: 16px;
+	width: 100%;
+	height: 42px;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+	font-family: 'Goodland', system-ui, sans-serif;
+	font-size: 14px;
+	font-weight: 800;
 
-  color: var(--text);
-  background: var(--today);
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
+	color: var(--text);
+	background: var(--today);
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
 }
 
-.btn-primary:hover{ filter: brightness(1.05); }
-.btn-primary:active{ filter: brightness(0.97); }
+.btn-primary:hover {
+	filter: brightness(1.05);
+}
+.btn-primary:active {
+	filter: brightness(0.97);
+}
 
 /* Divider */
-.divider{
-  margin: 18px 0 14px 0;
-  height: 2px;
-  background: rgba(219, 241, 255, 0.18);
+.divider {
+	margin: 18px 0 14px 0;
+	height: 2px;
+	background: rgba(219, 241, 255, 0.18);
 }
 
 /* Signup Row */
-.signup-row{
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  align-items: center;
-  font-size: 13px;
+.signup-row {
+	display: flex;
+	gap: 6px;
+	justify-content: center;
+	align-items: center;
+	font-size: 13px;
 }
 
-.link-signup{
-  padding: 0;
-  background: none;
-  border: none;
+.link-signup {
+	padding: 0;
+	background: none;
+	border: none;
 
-  font-family: "Goodland", system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 800;
+	font-family: 'Goodland', system-ui, sans-serif;
+	font-size: 13px;
+	font-weight: 800;
 
-  color: var(--accent);
-  cursor: pointer;
+	color: var(--accent);
+	cursor: pointer;
 }
 
-.link-signup:hover{
-  text-decoration: underline;
+.link-signup:hover {
+	text-decoration: underline;
 }
 
 /* Mobile */
-@media (max-width: 420px){
-  .auth-card{ padding: 20px; }
+@media (max-width: 420px) {
+	.auth-card {
+		padding: 20px;
+	}
 }
 </style>

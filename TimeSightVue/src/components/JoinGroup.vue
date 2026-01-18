@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import { getTokenSourceMapRange } from 'typescript';
+import {API} from "@/components/DataAccess.mjs";
 
 const emit = defineEmits(['close', 'group-joined']);
 
@@ -28,7 +29,7 @@ const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 const userId = ref(null);
 
-const API = "http://localhost:3000";
+// const API = "http://localhost:3000";
 
 onMounted(async () => {
     await userStore.fetchUser();

@@ -1,94 +1,97 @@
 <script setup>
-import { computed, onMounted, ref, nextTick, watch } from "vue";
-import { fetchData, formatDate, getTermineByDate } from "./components/DataAccess.mjs";
-import { useUserStore } from "@/stores/user";
-import { useLoadTaskStore } from '@/stores/loadTask.ts';
-import axios from 'axios';
-import TaskView from "./components/TaskView.vue";
+import { computed, onMounted, ref, nextTick, watch } from 'vue'
+import { fetchData, formatDate, getTermineByDate } from './components/DataAccess.mjs'
+import { useUserStore } from '@/stores/user'
+import { useLoadTaskStore } from '@/stores/loadTask.ts'
+import axios from 'axios'
+import TaskView from './components/TaskView.vue'
+import { API } from '@/components/DataAccess.mjs'
 
-const API = "http://localhost:3000";
+// const API = 'http://localhost:3000'
 
-const toDoTermine = ref([]);
-const overTermine = ref([]);
-const doneTermine = ref([]);
-const dates = ref([]);
-const datesIn = ref([]);
+const toDoTermine = ref([])
+const overTermine = ref([])
+const doneTermine = ref([])
+const dates = ref([])
+const datesIn = ref([])
 
-const userStore = useUserStore();
-const loadTaskStore = useLoadTaskStore();
+const userStore = useUserStore()
+const loadTaskStore = useLoadTaskStore()
 
-const isTerminSelected = ref(false);
-const terminViewRef = ref(null);
+const isTerminSelected = ref(false)
+const terminViewRef = ref(null)
 
-const view = ref("todo");
+const view = ref('todo')
 const list = computed(() => {
-	if (view.value === "todo") return toDoTermine.value;
-	if (view.value === "over") return overTermine.value;
-	if (view.value === "done") return doneTermine.value;
-	return [];
-});
+	if (view.value === 'todo') return toDoTermine.value
+	if (view.value === 'over') return overTermine.value
+	if (view.value === 'done') return doneTermine.value
+	return []
+})
 
 const sortedDatesIn = computed(() => {
-	const arr = [...datesIn.value];
-	return view.value === 'todo' ? arr.sort() : arr.sort().reverse();
-});
+	const arr = [...datesIn.value]
+	return view.value === 'todo' ? arr.sort() : arr.sort().reverse()
+})
 
 const sortedDates = computed(() => {
-	const arr = [...dates.value];
-	if (view.value === "todo") {
-		return arr.sort((a, b) => a.getTime() - b.getTime());
+	const arr = [...dates.value]
+	if (view.value === 'todo') {
+		return arr.sort((a, b) => a.getTime() - b.getTime())
 	} else {
-		return arr.sort((a, b) => b.getTime() - a.getTime());
+		return arr.sort((a, b) => b.getTime() - a.getTime())
 	}
-});
+})
 
 async function viewTermin(id) {
-	isTerminSelected.value = true;
-	await nextTick();
-	terminViewRef.value.init_termin(id);
+	isTerminSelected.value = true
+	await nextTick()
+	terminViewRef.value.init_termin(id)
 }
 
 async function change_erledigt(event, id) {
 	try {
-		await axios.patch(`${API}/termin_user/`, {ist_erledigt: event.target.checked}, 
-			{params: {termin_id: id, user_id: userStore.user.pk_user_id}}
-		);
+		await axios.patch(
+			`${API}/termin_user/`,
+			{ ist_erledigt: event.target.checked },
+			{ params: { termin_id: id, user_id: userStore.user.pk_user_id } },
+		)
 	} catch (err) {
-		console.log(err);
+		console.log(err)
 	}
-	loadTermine();
+	loadTermine()
 }
 
 function closeTermin(is_changed) {
 	if (is_changed) {
-		loadTermine();
+		loadTermine()
 	}
-	isTerminSelected.value = false;
+	isTerminSelected.value = false
 }
 
 async function loadTermine() {
-	const data = await fetchData();
-	toDoTermine.value = data.toDoTermine;
-	overTermine.value = data.overTermine;
-	doneTermine.value = data.doneTermine;
-	datesIn.value = data.datesIn;
-	dates.value = data.dates;
+	const data = await fetchData()
+	toDoTermine.value = data.toDoTermine
+	overTermine.value = data.overTermine
+	doneTermine.value = data.doneTermine
+	datesIn.value = data.datesIn
+	dates.value = data.dates
 }
 
 watch(
 	() => loadTaskStore.shouldLoad,
 	(newVal) => {
 		if (newVal === true) {
-			loadTermine();
-			loadTaskStore.shouldLoad = false;
+			loadTermine()
+			loadTaskStore.shouldLoad = false
 		}
 	},
-	{ immediate: true }
-);
+	{ immediate: true },
+)
 
 onMounted(() => {
-	loadTermine();
-});
+	loadTermine()
+})
 </script>
 
 <template>
@@ -108,7 +111,10 @@ onMounted(() => {
 
 	<dl>
 		<template v-for="(date, index) in sortedDates" :key="index">
-			<template v-for="(termin, i) in getTermineByDate(list, sortedDatesIn[index])" :key="termin.pk_termin_id">
+			<template
+				v-for="(termin, i) in getTermineByDate(list, sortedDatesIn[index])"
+				:key="termin.pk_termin_id"
+			>
 				<template v-if="termin && i === 0">
 					<dt>
 						<h2>{{ formatDate(date) }}</h2>
@@ -168,7 +174,9 @@ h3 {
 	font-size: 1.2rem;
 	font-weight: 400;
 	opacity: 0.7;
-	transition: opacity 0.15s ease, color 0.15s ease;
+	transition:
+		opacity 0.15s ease,
+		color 0.15s ease;
 }
 
 #navbar button.astext:hover h2 {
@@ -221,58 +229,57 @@ dd {
 	padding: 1.5rem;
 	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
+input[type='checkbox'] {
+	-webkit-appearance: none;
+	appearance: none;
 
-  width: 28px;
-  height: 28px;
+	width: 28px;
+	height: 28px;
 
-  border: 3px solid var(--text);
-  border-radius: 6px;
+	border: 3px solid var(--text);
+	border-radius: 6px;
 
-  background: transparent;
-  cursor: pointer;
+	background: transparent;
+	cursor: pointer;
 
-  position: relative; /* wichtig */
+	position: relative; /* wichtig */
 }
 
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
+input[type='checkbox'] {
+	-webkit-appearance: none;
+	appearance: none;
 
-  width: 28px;
-  height: 28px;
+	width: 28px;
+	height: 28px;
 
-  border: 3px solid var(--text);
-  border-radius: 6px;
+	border: 3px solid var(--text);
+	border-radius: 6px;
 
-  background: transparent;
-  cursor: pointer;
+	background: transparent;
+	cursor: pointer;
 
-  position: relative; /* wichtig */
+	position: relative; /* wichtig */
 }
 
 /* inner green square */
-input[type="checkbox"]::before {
-  content: "";
-  width: 16px;
-  height: 16px;
+input[type='checkbox']::before {
+	content: '';
+	width: 16px;
+	height: 16px;
 
-  background-color: var(--done);
-  border-radius: 3px;
+	background-color: var(--done);
+	border-radius: 3px;
 
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0);
 
-  transition: transform 0.12s ease-in-out;
+	transition: transform 0.12s ease-in-out;
 }
 
 /* checked state */
-input[type="checkbox"]:checked::before {
-  transform: translate(-50%, -50%) scale(1);
+input[type='checkbox']:checked::before {
+	transform: translate(-50%, -50%) scale(1);
 }
-
 </style>
