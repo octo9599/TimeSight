@@ -115,7 +115,7 @@ br{ display:none; }
 }
 
 .brand-logo{
-  font-weight: 800;
+  font-weight: 400;
   letter-spacing: .6px;
   font-size: 18px;
   color: var(--text);
@@ -129,7 +129,7 @@ br{ display:none; }
 
 .h1{
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .h2{

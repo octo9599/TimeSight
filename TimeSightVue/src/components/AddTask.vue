@@ -141,6 +141,7 @@ async function createTermin() {
     font-size: 1.4rem;
     text-align: center;
     color: var(--text);
+    font-weight: 400;
 }
 
 /* =========================
@@ -154,7 +155,7 @@ async function createTermin() {
 }
 
 .field label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     opacity: 0.85;
     color: var(--text);
 }
@@ -168,7 +169,8 @@ async function createTermin() {
     border: 2px solid var(--field);
 
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 1.2rem;
+    font-weight: 400;
 }
 
 .field input:focus,

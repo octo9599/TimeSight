@@ -98,7 +98,7 @@ async function loginSubmit() {
 }
 
 .brand-logo{
-  font-weight: 800;
+  font-weight: 400;
   letter-spacing: .6px;
   font-size: 18px;
   color: var(--text);
@@ -112,7 +112,7 @@ async function loginSubmit() {
 
 .h1{
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .h2{

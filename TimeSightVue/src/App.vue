@@ -45,7 +45,7 @@ const routeCheck = computed(() => router.currentRoute.value.path != '/auth');
 </script>
 
 <template>
-	<TopBar :showAcc="routeCheck" :darkMode="darkMode" @showPopup="popupChangeVisibility" />
+	<TopBar :showAcc="routeCheck" :showLogo="routeCheck" :darkMode="darkMode" @showPopup="popupChangeVisibility" />
 	<div id="horizontal-container">
 		<div id="sidebar">
 			<SideBar v-if="routeCheck" :darkMode="darkMode" @addTask="addChangeVisibility" />

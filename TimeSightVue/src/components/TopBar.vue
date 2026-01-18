@@ -1,6 +1,7 @@
 <script setup>
 	const props = defineProps({
 		showAcc: Boolean,
+		showLogo: Boolean,
 		darkMode: Boolean
 	});
 	const emit = defineEmits(['showPopup']);
@@ -17,7 +18,7 @@
 
 <template>
 	<div id="topbar-container">
-		<section class="topbar-icon-containers">
+		<section v-if="showLogo" class="topbar-icon-containers">
 			<router-link to="/">
 				<img id="eye-icon" alt="TimeSight Logo" class="icons" src="@/assets/images/TISI-Logo.png">
 			</router-link>

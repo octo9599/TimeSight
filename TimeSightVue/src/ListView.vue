@@ -140,11 +140,13 @@ onMounted(() => {
 
 h2 {
 	margin: 0;
+	font-weight: 400;
 }
 
 h3 {
 	margin: 0;
 	padding: 1rem;
+	font-weight: 400;
 }
 
 #navbar {
@@ -164,7 +166,7 @@ h3 {
 
 #navbar h2 {
 	font-size: 1.2rem;
-	font-weight: 600;
+	font-weight: 400;
 	opacity: 0.7;
 	transition: opacity 0.15s ease, color 0.15s ease;
 }
