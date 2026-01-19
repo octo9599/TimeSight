@@ -23,8 +23,8 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
     # Optional: nur wenn du von deinem Host direkt auf die DB zugreifen willst.
     # Sonst entfernen, dann ist DB nur intern erreichbar.
-#    ports:
-#      - "${DB_PORT:-3306}:3306"
+    ports:
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
 
