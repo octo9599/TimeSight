@@ -575,6 +575,7 @@ app.delete("/gruppe/:group_id", async (req, res) => {
         }
 
         await runQuery("DELETE tu FROM Termin_User tu JOIN Termin t ON tu.fk_termin_id = t.pk_termin_id WHERE t.fk_group_id = ?", [group_id]);
+        await runQuery("DELETE FROM Termin WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Gruppe_User WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Beitritt_Anfrage WHERE fk_group_id = ?", [group_id]);
         await runQuery("DELETE FROM Ban WHERE fk_group_id = ?", [group_id]);
