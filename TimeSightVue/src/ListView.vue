@@ -1,12 +1,10 @@
 <script setup>
 import { computed, onMounted, ref, nextTick, watch } from "vue";
-import { fetchData, formatDate, getTermineByDate } from "./components/DataAccess.mjs";
+import { fetchData, formatDate, getTermineByDate, API } from "./components/DataAccess.mjs";
 import { useUserStore } from "@/stores/user";
 import { useLoadTaskStore } from '@/stores/loadTask.ts';
 import axios from 'axios';
 import TaskView from "./components/TaskView.vue";
-
-const API = "http://localhost:3000";
 
 const toDoTermine = ref([]);
 const overTermine = ref([]);

@@ -1,9 +1,7 @@
 <script setup>
 import axios from "axios";
 import { ref, onMounted } from "vue";
-import { fetchData } from "./DataAccess.mjs"
-
-const API = "http://localhost:3000"
+import { fetchData, API } from "./DataAccess.mjs"
 
 let logged = ref(false);
 const failed = ref("");

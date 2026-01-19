@@ -1,11 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { fetchData } from './DataAccess.mjs';
+import { fetchData, API } from './DataAccess.mjs';
 import axios from 'axios';
 
 const emit = defineEmits(['close']);
-
-const API = "http://localhost:3000";
 
 let data = null;
 const groupsOfUser = ref("loading...");

@@ -3,10 +3,9 @@ import { ref, onMounted, watch } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import axios from 'axios';
+import { API } from "@/components/DataAccess.mjs";
 
 const emit = defineEmits(['close', 'group-created']);
-
-const API = "http://localhost:3000";
 
 const gruppenname = ref("");
 const inviteCode = ref("");

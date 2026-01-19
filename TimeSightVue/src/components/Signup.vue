@@ -2,8 +2,7 @@
 import axios from 'axios';
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
-
-const API = "http://localhost:3000";
+import { API } from "@/components/DataAccess.mjs";
 
 const username = ref("");
 const password = ref("");
