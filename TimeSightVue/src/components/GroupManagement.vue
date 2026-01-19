@@ -481,7 +481,7 @@ async function deleteGroup() {
         @click.self="showDeleteForm = false"
     >
         <div class="modal-window">
-            Geben Sie den Gruppennamen ein, zum
+            Geben Sie den Gruppennamen ({{ group.gruppenname }}) ein, zum
             Bestätigen, die Gruppe löschen zu
             wollen.
 
