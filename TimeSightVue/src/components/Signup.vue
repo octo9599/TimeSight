@@ -41,7 +41,7 @@ async function signupSubmit() {
 
     window.location.reload();
   } catch (err) {
-    print(err);
+    console.log(err);
     if(err.status) {
       failed.value = `Error Code ${err.status}: Something went wrong during signup process.`;
     } else {
