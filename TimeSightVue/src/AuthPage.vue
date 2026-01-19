@@ -15,12 +15,12 @@ function switchAuth() {
 <template>
 
 	<div>
-		<Login v-if="isLogin"/>
-		<Signup v-else/>
+<!--		<Login v-if="isLogin"/>-->
+<!--		<Signup v-else/>-->
 
 		<Login v-if="isLogin" @switch="switchAuth" />
     	<Signup v-else @switch="switchAuth" />
-		
+
 	</div>
 </template>
 

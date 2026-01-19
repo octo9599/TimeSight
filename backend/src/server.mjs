@@ -15,6 +15,9 @@ const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
 //initialize app
 const app = express();
+
+app.set("trust proxy", 1);
+
 app.use(cors({
     origin: corsOrigin,
     credentials: true

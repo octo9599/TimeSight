@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { API } from '@/components/DataAccess.mjs'
+import router from '@/router/index.ts'
 
 // const API = 'http://localhost:3000'
 
@@ -46,6 +47,7 @@ async function signupSubmit() {
 			{ withCredentials: true },
 		)
 
+		router.push("/")
 		window.location.reload()
 	} catch (err) {
 		print(err)
