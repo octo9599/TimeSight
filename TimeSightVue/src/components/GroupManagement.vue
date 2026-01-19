@@ -368,12 +368,7 @@ async function deleteGroup() {
     </div>
 
     <div>
-        <button
-            @click="
-                showBanUsername =
-                    !showBanUsername
-            "
-        >
+        <button @click="showBanUsername =!showBanUsername">
             Per Username bannen
         </button>
 
@@ -387,7 +382,7 @@ async function deleteGroup() {
                 v-model="banUserName"
                 required
             />
-            <button type="submit">Ban</button>
+            <button type="submit" class="ban-btn">Ban</button>
         </form>
 
         <div v-for="user in users">
@@ -481,6 +476,7 @@ async function deleteGroup() {
 
     <div
         class="modal-overlay"
+        id="delete-window"
         v-if="showDeleteForm"
         @click.self="showDeleteForm = false"
     >
@@ -695,13 +691,6 @@ async function deleteGroup() {
     FOOTER
     ========================= */
 
-    .modal-window > div:last-child {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-    }
-
     .modal-window > div:last-child button {
         background: #ef4444;
         color: var(--text);
@@ -732,8 +721,13 @@ async function deleteGroup() {
 ========================= */
 
 .unban-btn {
-    color: #ef4444;
+    color: crimson;
     margin-left: 66px;
+}
+
+.ban-btn {
+    color: crimson;
+    margin-left: 1.5%;
 }
 
 
