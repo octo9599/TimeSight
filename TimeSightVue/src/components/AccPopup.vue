@@ -26,6 +26,7 @@ onMounted(async () => {
 		<hr>
 		<router-link class="links" to="/account" @click="emit('close')">Account</router-link>
 		<button id="mode-btn" @click="emit('toggle-theme')">{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</button>
+		<router-link class="links" to="/imprint" @click="emit('close')">Impressum</router-link>
 		<router-link class="links" id="logout" to="/logout">Log out</router-link>
 	</div>
 </template>
