@@ -165,7 +165,7 @@ app.get("/user/:user_id", async (req, res) => {
         if (!user_id) {
             return res.status(400).json({error: "user_id is required for viewing a user"});
         }
-        const rows = await runQuery("SELECT * FROM User WHERE pk_user_id = ?", [user_id]);
+        const rows = await runQuery("SELECT pk_user_id, username FROM User WHERE pk_user_id = ?", [user_id]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch user"})
@@ -179,7 +179,7 @@ app.get("/user", async (req, res) => {
         if (!username) {
             return res.status(400).json({error: "username is required for viewing a user"});
         }
-        const rows = await runQuery("SELECT * FROM User WHERE username = ?", [username]);
+        const rows = await runQuery("SELECT pk_user_id, username FROM User WHERE username = ?", [username]);
         res.json(rows);
     } catch {
         res.status(500).json({error: "Failed to fetch user"})
@@ -253,7 +253,7 @@ app.get("/gruppe_user", async (req, res) => {
 app.get("/gruppe/:group_id/user", async (req, res) => {
     try {
         const {group_id} = req.params;
-        let sql = "SELECT u.*, gu.ist_admin, gu.kann_bearbeiten, gu.kann_loeschen FROM User u INNER JOIN Gruppe_User gu ON pk_user_id = gu.fk_user_id WHERE gu.fk_group_id = ?";
+        let sql = "SELECT u.pk_user_id, u.username, gu.ist_admin, gu.kann_bearbeiten, gu.kann_loeschen FROM User u INNER JOIN Gruppe_User gu ON pk_user_id = gu.fk_user_id WHERE gu.fk_group_id = ?";
         if (!group_id) {
             return res.status(400).json({error: "group_id is required for viewing users in a group"});
         }
@@ -385,7 +385,7 @@ app.post("/gruppe/:group_id/termin_user", async (req, res) => {
     const {group_id} = req.params;
 
     if (!group_id || !user_id) {
-        return res.status(400).json({error: "termin_id and user_id are required to create a termin_user entry"});
+        return res.status(400).json({error: "group_id and user_id are required to create a termin_user entry"});
     }
 
     try {

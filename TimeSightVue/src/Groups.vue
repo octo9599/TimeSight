@@ -133,6 +133,7 @@ function showCode(group_id) {
 async function answerInvite(request, accepted) {
     await axios.delete(`${API}/beitritt_anfrage/${request.anfrage_id}`);
     if (accepted) {
+        
         await axios.post(`${API}/gruppe_user`, {
             markierungsfarbe: null,
             ist_admin: 0,
