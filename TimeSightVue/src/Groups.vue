@@ -153,6 +153,22 @@ async function changeShowGroupMngmt(group_id) {
         await fetchGroups();
     }
 }
+
+async function leaveGroup(group_id) {
+
+    try {
+
+        const data = await fetchData();
+        await axios.delete(`${API}/gruppe_user`, { params: {user_id: data.user.pk_user_id, group_id} });
+
+        await fetchGroups();
+
+    } catch (err) {
+        console.error("Error leaving group: ", err);
+    }
+
+}
+
 </script>
 
 <template>
@@ -174,6 +190,11 @@ async function changeShowGroupMngmt(group_id) {
                         </button>
                         <button @click="changeShowGroupMngmt(group.pk_group_id)">
                             Gruppe Verwalten
+                        </button>
+                    </span>
+                    <span v-else>
+                        <button id="btn-leave" @click="leaveGroup(group.pk_group_id)">
+                            Gruppe verlassen
                         </button>
                     </span>
                 </div>
@@ -515,6 +536,10 @@ async function changeShowGroupMngmt(group_id) {
     padding: 1.5rem;
 
     border: 2px solid var(--field);
+}
+
+#btn-leave {
+    color: crimson;
 }
 
 </style>
