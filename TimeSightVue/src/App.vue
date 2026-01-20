@@ -85,6 +85,7 @@ const routeCheck = computed(() => router.currentRoute.value.path != '/auth');
 	background-color: var(--main);
 	color: var(--text);
 	margin: 0;
+	overflow: scroll;
 }
 
 /* AddTask Window */
@@ -131,4 +132,5 @@ const routeCheck = computed(() => router.currentRoute.value.path != '/auth');
 	position: fixed;
 	gap: 0.3rem;
 }
+
 </style>
