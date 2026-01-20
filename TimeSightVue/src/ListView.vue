@@ -229,21 +229,7 @@ input[type="checkbox"] {
   border: 3px solid var(--text);
   border-radius: 6px;
 
-  background: transparent;
-  cursor: pointer;
-
-  position: relative; /* wichtig */
-}
-
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-
-  width: 28px;
-  height: 28px;
-
-  border: 3px solid var(--text);
-  border-radius: 6px;
+  margin-right: 1rem;
 
   background: transparent;
   cursor: pointer;
