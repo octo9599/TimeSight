@@ -42,7 +42,8 @@
 				id: termin.pk_termin_id,
 				title: bezeichnung,
 				start: termin.datum,
-				end: endtime
+				end: endtime,
+				classNames: termin.ist_erledigt ? ['completed'] : []
 			});
 		});
 	}
@@ -288,5 +289,11 @@
   animation: modalIn 0.2s ease-out;
 }
 
+/* strike-through the title text */
+.fc-daygrid-event.completed .fc-event-title,
+.fc-event.completed .fc-event-title {
+  color: var(--done);
+  text-decoration: line-through;
+}
 
 </style>
