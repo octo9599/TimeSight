@@ -1,8 +1,7 @@
 <script setup>
 import axios from 'axios'
 import {onMounted} from 'vue';
-
-const API = "http://localhost:3000";
+import { API } from '@/components/DataAccess.mjs';
 
 onMounted(async () => {
 	try {
