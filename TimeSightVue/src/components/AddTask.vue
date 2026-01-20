@@ -21,6 +21,10 @@ onMounted(async () => {
 
 async function createTermin() {
 
+    if(!uhrzeit.value) {
+        uhrzeit.value = '23:59';
+    }
+
     const termin = await axios.post(`${API}/termin`, {
         bezeichnung: bezeichnung.value,
         beschreibung: beschreibung.value,
