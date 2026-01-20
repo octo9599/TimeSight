@@ -80,21 +80,3 @@ CREATE TABLE Ban (
                          REFERENCES  `User` (pk_user_id)
 
 );
-
-INSERT INTO User VALUES (null, 'TvT', SHA2('secret',256));
-INSERT INTO User VALUES (null, 'Timmy', Sha2('1234', 256));
-INSERT INTO User VALUES (null, 'IchBinBoese', SHA2('>:(', 256));
-INSERT INTO Gruppe VALUES (null, 'Beste Gruppe', 'WASDWASD');
-INSERT INTO Gruppe VALUES (null, 'Zweitbeste Gruppe', 'AAAABBBB');
-INSERT INTO Gruppe_User VALUES (null, true, true, true, 1, 1);
-INSERT INTO Gruppe_User VALUES (null, false, true, true, 2, 2);
-INSERT INTO Gruppe_User VALUES (null, true, false, false, 2, 1);
-INSERT INTO Ban VALUES (null, 3, 1);
-INSERT Termin VALUES (null, 'sterben', 'tote nummer', '2025-05-14 16:20:00', 1, 1);
-INSERT Termin VALUES (null, 'sterben', 'tote nummer', '2025-07-22 08:12:45', 1, 1);
-INSERT Termin_User VALUES (true, 1, 1);
-INSERT Termin_User VALUES (false, 1, 2);
-INSERT Termin_User VALUES (false, 2, 1);
-INSERT Termin_User VALUES (false, 2, 2);
-
-
